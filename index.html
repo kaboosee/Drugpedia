@@ -1,0 +1,879 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Drugpedia</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Drugpedia</h1>
+      <p>
+        Reference material compiled from TripSit, PsychonautWiki, Talk to
+        Frank, and Erowid. This is harm reduction guidance, not medical advice.
+      </p>
+      <p class="muted">
+        Use for personal education only. If in doubt or unwell, seek medical
+        help.
+      </p>
+    </header>
+
+    <main>
+      <section class="panel index" aria-labelledby="index-title">
+        <h2 id="index-title">Substance index</h2>
+        <div class="controls">
+          <input
+            id="search"
+            type="search"
+            placeholder="Search substances"
+            aria-label="Search substances"
+          />
+          <select id="categoryFilter" aria-label="Filter by category">
+            <option value="all">All categories</option>
+          </select>
+        </div>
+        <div id="substanceList" class="list" role="list"></div>
+        <p id="noResults" class="muted" hidden>No substances found.</p>
+      </section>
+
+      <section class="panel detail" aria-labelledby="detail-title">
+        <h2 id="detail-title">Substance detail</h2>
+        <div id="detailContent" class="detail-grid"></div>
+      </section>
+
+      <section class="panel interaction" aria-labelledby="interaction-title">
+        <h2 id="interaction-title">Drug interaction checker</h2>
+        <div class="interaction-grid">
+          <div id="interactionList" class="checkbox-list"></div>
+          <div id="interactionResult" class="muted">
+            Select at least two substances to view interaction risk.
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const substances = [
+        {
+          id: "mdma",
+          name: "MDMA",
+          category: "Entactogen / Stimulant",
+          mechanism:
+            "Primarily increases serotonin release and reuptake inhibition, with secondary dopamine and norepinephrine effects.",
+          onset: "Oral: 30–60 min. Insufflated: 5–15 min.",
+          duration: "Total: 4–6 h (after-effects 1–2 days possible).",
+          dosage:
+            "Oral common range: 75–125 mg. Redosing increases neurotoxicity and dehydration risk.",
+          acuteRisks: [
+            "Hyperthermia, dehydration, hyponatremia",
+            "Serotonin syndrome (especially with other serotonergic drugs)",
+            "Jaw clenching, elevated heart rate, anxiety",
+          ],
+          harmReduction: [
+            "Space doses by several weeks; avoid frequent use",
+            "Sip water regularly, avoid overhydration",
+            "Keep body temperature down and take breaks",
+          ],
+          contraindications: [
+            "SSRIs/MAOIs or other serotonergic medications",
+            "Cardiovascular disease or hypertension",
+          ],
+        },
+        {
+          id: "cocaine",
+          name: "Cocaine",
+          category: "Stimulant",
+          mechanism:
+            "Blocks reuptake of dopamine, norepinephrine, and serotonin, increasing synaptic levels.",
+          onset: "Insufflated: 1–5 min. Smoked: seconds.",
+          duration: "15–45 min with strong cravings after.",
+          dosage: "Insufflated common range: 20–60 mg per line.",
+          acuteRisks: [
+            "Cardiovascular stress, arrhythmia, hypertension",
+            "Anxiety, paranoia, agitation",
+            "High addiction potential and compulsive redosing",
+          ],
+          harmReduction: [
+            "Avoid frequent redosing; set a strict limit",
+            "Use smaller test amounts to assess potency",
+            "Avoid mixing with other stimulants or alcohol",
+          ],
+          contraindications: [
+            "Heart conditions or high blood pressure",
+            "History of anxiety or panic disorders",
+          ],
+        },
+        {
+          id: "2cb",
+          name: "2C-B",
+          category: "Psychedelic",
+          mechanism:
+            "Serotonergic psychedelic with 5-HT2A agonism and mild stimulant effects.",
+          onset: "Oral: 45–90 min.",
+          duration: "4–6 h (after-effects 1–3 h).",
+          dosage: "Oral common range: 10–25 mg.",
+          acuteRisks: [
+            "Nausea, anxiety, overstimulation",
+            "Increased heart rate and blood pressure",
+            "Potential for panic in high doses",
+          ],
+          harmReduction: [
+            "Start low; effects can be dose-sensitive",
+            "Choose a calm setting with trusted people",
+            "Avoid mixing with other serotonergic drugs",
+          ],
+          contraindications: [
+            "SSRI/MAOI use or seizure disorders",
+            "History of psychosis or severe anxiety",
+          ],
+        },
+        {
+          id: "cannabis",
+          name: "Cannabis",
+          category: "Cannabinoid",
+          mechanism:
+            "THC is a partial CB1/CB2 agonist, altering neurotransmitter release and perception.",
+          onset: "Inhaled: 1–5 min. Oral: 30–120 min.",
+          duration: "Inhaled: 2–4 h. Oral: 4–8 h.",
+          dosage: "Inhaled: 1–3 small inhalations. Oral: 2.5–10 mg THC.",
+          acuteRisks: [
+            "Anxiety, paranoia, dizziness",
+            "Impaired coordination and reaction time",
+            "Increased heart rate",
+          ],
+          harmReduction: [
+            "Start low and wait before redosing",
+            "Avoid driving or operating machinery",
+            "Prefer lower-THC options if sensitive",
+          ],
+          contraindications: [
+            "History of psychosis or severe anxiety",
+            "Cardiovascular instability",
+          ],
+        },
+        {
+          id: "alcohol",
+          name: "Alcohol",
+          category: "Depressant",
+          mechanism:
+            "Enhances GABA activity and inhibits glutamate, causing sedation and impaired judgment.",
+          onset: "10–30 min.",
+          duration: "1–6 h depending on dose.",
+          dosage:
+            "Standard drink: ~14 g ethanol (varies by beverage and pour).",
+          acuteRisks: [
+            "Respiratory depression at high doses",
+            "Vomiting and aspiration risk",
+            "Impaired coordination and judgment",
+          ],
+          harmReduction: [
+            "Pace with water and food",
+            "Avoid mixing with other depressants",
+            "Know your standard drink equivalents",
+          ],
+          contraindications: [
+            "Liver disease or GI bleeding",
+            "Concurrent sedatives (benzodiazepines, opioids)",
+          ],
+        },
+        {
+          id: "ketamine",
+          name: "Ketamine",
+          category: "Dissociative",
+          mechanism:
+            "NMDA receptor antagonist leading to dissociation and analgesia.",
+          onset: "Insufflated: 5–15 min. IM: 1–5 min.",
+          duration: "45–90 min (after-effects 1–2 h).",
+          dosage: "Insufflated common range: 20–60 mg.",
+          acuteRisks: [
+            "Disorientation, falls, accidents",
+            "Nausea and vomiting",
+            "Respiratory depression when mixed with depressants",
+          ],
+          harmReduction: [
+            "Use in a safe, seated environment",
+            "Avoid mixing with alcohol or sedatives",
+            "Stay hydrated and avoid frequent redosing",
+          ],
+          contraindications: [
+            "Cardiovascular disease or hypertension",
+            "History of bladder issues with frequent use",
+          ],
+        },
+        {
+          id: "lsd",
+          name: "LSD",
+          category: "Psychedelic",
+          mechanism:
+            "Potent 5-HT2A agonist producing long-lasting psychedelic effects.",
+          onset: "Oral/sublingual: 30–90 min.",
+          duration: "8–12 h (after-effects 2–4 h).",
+          dosage: "Common range: 50–150 µg (potency varies widely).",
+          acuteRisks: [
+            "Anxiety, panic, or confusion in challenging settings",
+            "Impaired judgment and coordination",
+            "Elevated heart rate or blood pressure",
+          ],
+          harmReduction: [
+            "Test blotters (avoid NBOMe/DOx misrepresentation)",
+            "Choose safe settings and trusted company",
+            "Start low; avoid redosing early",
+          ],
+          contraindications: [
+            "History of psychosis or bipolar mania",
+            "Unstable mental health or severe anxiety",
+          ],
+        },
+        {
+          id: "psilocybin",
+          name: "Psilocybin (Mushrooms)",
+          category: "Psychedelic",
+          mechanism:
+            "Psilocin activates 5-HT2A receptors, altering perception and mood.",
+          onset: "Oral: 20–60 min.",
+          duration: "4–6 h (after-effects 1–2 h).",
+          dosage: "Dried mushrooms common range: 1–3 g (potency varies).",
+          acuteRisks: [
+            "Nausea, anxiety, or confusion",
+            "Impaired coordination and judgment",
+            "Potential panic at higher doses",
+          ],
+          harmReduction: [
+            "Confirm species and avoid unknown foraged mushrooms",
+            "Start low and wait before redosing",
+            "Use a calm setting with a trusted sitter",
+          ],
+          contraindications: [
+            "History of psychosis or bipolar mania",
+            "Severe anxiety disorders",
+          ],
+        },
+        {
+          id: "amphetamine",
+          name: "Amphetamine (Speed)",
+          category: "Stimulant",
+          mechanism:
+            "Releases dopamine and norepinephrine and inhibits reuptake.",
+          onset: "Oral: 20–60 min. Insufflated: 5–15 min.",
+          duration: "4–8 h.",
+          dosage: "Oral common range: 10–30 mg (purity varies).",
+          acuteRisks: [
+            "Elevated heart rate, blood pressure, and overheating",
+            "Anxiety, agitation, insomnia",
+            "Compulsive redosing and dehydration",
+          ],
+          harmReduction: [
+            "Avoid frequent redosing; set a clear limit",
+            "Cool environment and regular water intake",
+            "Avoid mixing with other stimulants",
+          ],
+          contraindications: [
+            "Cardiovascular disease or hypertension",
+            "MAOI use or severe anxiety disorders",
+          ],
+        },
+        {
+          id: "methamphetamine",
+          name: "Methamphetamine",
+          category: "Stimulant",
+          mechanism:
+            "Very potent monoamine releaser (dopamine, norepinephrine, serotonin).",
+          onset: "Smoked: seconds. Oral: 20–60 min.",
+          duration: "8–14 h (after-effects longer).",
+          dosage: "Oral common range: 5–20 mg (very potent).",
+          acuteRisks: [
+            "Extreme cardiovascular strain and overheating",
+            "Agitation, paranoia, or psychosis",
+            "Severe dehydration and sleep deprivation",
+          ],
+          harmReduction: [
+            "Avoid binges; prioritize sleep and food",
+            "Hydrate and cool down regularly",
+            "Do not mix with other stimulants",
+          ],
+          contraindications: [
+            "Cardiovascular disease or hypertension",
+            "History of psychosis or bipolar mania",
+          ],
+        },
+        {
+          id: "benzodiazepines",
+          name: "Benzodiazepines (e.g., diazepam)",
+          category: "Depressant",
+          mechanism:
+            "Enhance GABA-A activity, producing sedation and anxiolysis.",
+          onset: "Oral: 20–60 min (varies by compound).",
+          duration: "6–24 h depending on compound.",
+          dosage: "Varies widely by compound; use the lowest effective dose.",
+          acuteRisks: [
+            "Memory impairment and loss of coordination",
+            "Respiratory depression when combined with other depressants",
+            "Dependence with frequent use",
+          ],
+          harmReduction: [
+            "Never mix with alcohol, opioids, or GHB",
+            "Avoid daily use to reduce dependence risk",
+            "Do not drive or operate machinery",
+          ],
+          contraindications: [
+            "Respiratory disease or sleep apnea",
+            "History of benzodiazepine dependence",
+          ],
+        },
+        {
+          id: "opioids",
+          name: "Opioids (e.g., oxycodone)",
+          category: "Opioid / Depressant",
+          mechanism:
+            "Mu-opioid receptor agonism leading to analgesia and sedation.",
+          onset: "Oral: 20–60 min.",
+          duration: "3–6 h (varies by compound).",
+          dosage:
+            "Oral common range: 5–15 mg oxycodone-equivalent (tolerance varies).",
+          acuteRisks: [
+            "Respiratory depression and overdose",
+            "Nausea, vomiting, and itching",
+            "Loss of consciousness at higher doses",
+          ],
+          harmReduction: [
+            "Avoid mixing with depressants; carry naloxone",
+            "Never use alone; keep a phone nearby",
+            "Use a small test dose with new supply",
+          ],
+          contraindications: [
+            "Respiratory disease or sleep apnea",
+            "Concurrent sedatives or alcohol",
+          ],
+        },
+        {
+          id: "ghb",
+          name: "GHB/GBL",
+          category: "Depressant",
+          mechanism:
+            "GABA-B agonist; GBL converts to GHB with strong sedative effects.",
+          onset: "10–30 min.",
+          duration: "2–4 h.",
+          dosage:
+            "GHB: 1–3 g or GBL: 0.5–1.5 mL (concentration varies).",
+          acuteRisks: [
+            "Sudden sedation and loss of consciousness",
+            "Vomiting with aspiration risk",
+            "Respiratory depression when combined with other depressants",
+          ],
+          harmReduction: [
+            "Measure carefully with a syringe; never eyeball",
+            "Avoid redosing too soon (delayed onset)",
+            "Do not mix with alcohol, benzos, or opioids",
+          ],
+          contraindications: [
+            "Concurrent depressant use",
+            "Respiratory conditions",
+          ],
+        },
+        {
+          id: "nitrous",
+          name: "Nitrous Oxide",
+          category: "Dissociative",
+          mechanism:
+            "Short-acting NMDA antagonism with dissociative effects.",
+          onset: "Seconds.",
+          duration: "1–3 min.",
+          dosage: "Common range: 1 balloon with breaks between uses.",
+          acuteRisks: [
+            "Oxygen deprivation and fainting",
+            "Falls or injuries while standing",
+            "Tingling or numbness with heavy use",
+          ],
+          harmReduction: [
+            "Use seated; take regular breaks",
+            "Never use with a bag or mask",
+            "Avoid frequent use to reduce B12 depletion",
+          ],
+          contraindications: [
+            "B12 deficiency or neurological issues",
+            "Respiratory problems",
+          ],
+        },
+        {
+          id: "dxm",
+          name: "DXM (Dextromethorphan)",
+          category: "Dissociative",
+          mechanism:
+            "NMDA antagonist with sigma-1 and serotonergic effects.",
+          onset: "30–90 min.",
+          duration: "4–8 h.",
+          dosage:
+            "Common range: 100–300 mg DXM base (formulation matters).",
+          acuteRisks: [
+            "Nausea, confusion, and elevated heart rate",
+            "Serotonin syndrome when mixed with serotonergic drugs",
+            "Ataxia and dissociation at higher doses",
+          ],
+          harmReduction: [
+            "Avoid products with acetaminophen or antihistamines",
+            "Do not mix with SSRIs, MAOIs, or MDMA",
+            "Measure carefully and avoid redosing early",
+          ],
+          contraindications: [
+            "SSRI/MAOI use",
+            "Liver disease or respiratory issues",
+          ],
+        },
+      ];
+
+      const interactions = {
+        "2cb|alcohol": {
+          risk: "caution",
+          summary: "Increased nausea and impaired judgment.",
+        },
+        "2cb|amphetamine": {
+          risk: "dangerous",
+          summary: "Stimulation and anxiety can spike with psychedelic effects.",
+        },
+        "2cb|cannabis": {
+          risk: "caution",
+          summary: "Can intensify anxiety or confusion.",
+        },
+        "2cb|cocaine": {
+          risk: "dangerous",
+          summary: "High stimulant load and potential panic.",
+        },
+        "2cb|ketamine": {
+          risk: "dangerous",
+          summary: "Unpredictable dissociation and sensory overload.",
+        },
+        "2cb|lsd": {
+          risk: "dangerous",
+          summary: "Very intense psychedelic effects and confusion risk.",
+        },
+        "2cb|mdma": {
+          risk: "dangerous",
+          summary: "Serotonergic overload and overheating risk.",
+        },
+        "2cb|methamphetamine": {
+          risk: "dangerous",
+          summary: "Extreme stimulation and overheating risk.",
+        },
+        "2cb|psilocybin": {
+          risk: "dangerous",
+          summary: "Intense effects and nausea risk.",
+        },
+        "alcohol|amphetamine": {
+          risk: "dangerous",
+          summary: "Cardiovascular strain and dehydration increase.",
+        },
+        "alcohol|benzodiazepines": {
+          risk: "do not combine",
+          summary: "High risk of respiratory depression and blackouts.",
+        },
+        "alcohol|cannabis": {
+          risk: "caution",
+          summary: "Increased impairment, nausea, and blackouts.",
+        },
+        "alcohol|cocaine": {
+          risk: "dangerous",
+          summary: "Forms cocaethylene, increasing cardiotoxicity.",
+        },
+        "alcohol|dxm": {
+          risk: "dangerous",
+          summary: "Increased dissociation and respiratory risk.",
+        },
+        "alcohol|ghb": {
+          risk: "do not combine",
+          summary: "Very high overdose risk due to sedation.",
+        },
+        "alcohol|ketamine": {
+          risk: "do not combine",
+          summary: "High risk of respiratory depression and vomiting.",
+        },
+        "alcohol|lsd": {
+          risk: "caution",
+          summary: "Increases confusion and poor decision-making.",
+        },
+        "alcohol|mdma": {
+          risk: "caution",
+          summary: "Dehydration and overheating risks increase.",
+        },
+        "alcohol|methamphetamine": {
+          risk: "dangerous",
+          summary: "Cardiovascular strain and overheating increase.",
+        },
+        "alcohol|nitrous": {
+          risk: "caution",
+          summary: "Higher risk of fainting and oxygen deprivation.",
+        },
+        "alcohol|opioids": {
+          risk: "do not combine",
+          summary: "High risk of fatal respiratory depression.",
+        },
+        "alcohol|psilocybin": {
+          risk: "caution",
+          summary: "Increased nausea and impaired judgment.",
+        },
+        "amphetamine|cocaine": {
+          risk: "dangerous",
+          summary: "Strong stimulant load and heart strain.",
+        },
+        "amphetamine|dxm": {
+          risk: "dangerous",
+          summary: "Stimulation plus serotonergic effects raise risk.",
+        },
+        "amphetamine|mdma": {
+          risk: "dangerous",
+          summary: "High stimulant/serotonergic load and overheating risk.",
+        },
+        "amphetamine|methamphetamine": {
+          risk: "dangerous",
+          summary: "Extreme stimulation and cardiovascular stress.",
+        },
+        "benzodiazepines|ghb": {
+          risk: "do not combine",
+          summary: "High risk of deep sedation and overdose.",
+        },
+        "benzodiazepines|ketamine": {
+          risk: "dangerous",
+          summary: "Heavy sedation and accident risk.",
+        },
+        "benzodiazepines|opioids": {
+          risk: "do not combine",
+          summary: "Severe respiratory depression risk.",
+        },
+        "cannabis|cocaine": {
+          risk: "caution",
+          summary: "May increase anxiety and heart strain.",
+        },
+        "cannabis|ghb": {
+          risk: "caution",
+          summary: "Sedation and dizziness increase.",
+        },
+        "cannabis|ketamine": {
+          risk: "caution",
+          summary: "Dizziness and dissociation can worsen.",
+        },
+        "cannabis|lsd": {
+          risk: "caution",
+          summary: "Can intensify anxiety and confusion.",
+        },
+        "cannabis|mdma": {
+          risk: "caution",
+          summary: "May increase anxiety and impair judgment.",
+        },
+        "cannabis|nitrous": {
+          risk: "caution",
+          summary: "Increased dizziness and falls.",
+        },
+        "cannabis|opioids": {
+          risk: "caution",
+          summary: "Enhanced sedation and dizziness.",
+        },
+        "cannabis|psilocybin": {
+          risk: "caution",
+          summary: "Can intensify anxiety and nausea.",
+        },
+        "cocaine|dxm": {
+          risk: "dangerous",
+          summary: "Stimulant strain with dissociation and confusion.",
+        },
+        "cocaine|ketamine": {
+          risk: "dangerous",
+          summary: "Competing effects strain the heart and judgment.",
+        },
+        "cocaine|mdma": {
+          risk: "dangerous",
+          summary: "Strong cardiovascular stress and overheating risk.",
+        },
+        "cocaine|methamphetamine": {
+          risk: "dangerous",
+          summary: "Extreme stimulant load and hypertension risk.",
+        },
+        "cocaine|opioids": {
+          risk: "dangerous",
+          summary: "Stimulation can mask overdose warning signs.",
+        },
+        "dxm|ketamine": {
+          risk: "dangerous",
+          summary: "Deep dissociation and coordination loss.",
+        },
+        "dxm|lsd": {
+          risk: "dangerous",
+          summary: "Unpredictable psychedelic and dissociative effects.",
+        },
+        "dxm|mdma": {
+          risk: "do not combine",
+          summary: "High risk of serotonin syndrome.",
+        },
+        "dxm|psilocybin": {
+          risk: "dangerous",
+          summary: "Increased confusion, nausea, and panic risk.",
+        },
+        "ghb|ketamine": {
+          risk: "do not combine",
+          summary: "High risk of respiratory depression.",
+        },
+        "ghb|mdma": {
+          risk: "dangerous",
+          summary: "Unpredictable sedation and dehydration risk.",
+        },
+        "ghb|opioids": {
+          risk: "do not combine",
+          summary: "Severe respiratory depression risk.",
+        },
+        "ketamine|mdma": {
+          risk: "caution",
+          summary: "Dehydration and dissociation can compound risks.",
+        },
+        "ketamine|lsd": {
+          risk: "dangerous",
+          summary: "Dissociation combined with strong visuals.",
+        },
+        "ketamine|nitrous": {
+          risk: "caution",
+          summary: "Disorientation and fall risk increase.",
+        },
+        "ketamine|opioids": {
+          risk: "dangerous",
+          summary: "Respiratory depression risk increases.",
+        },
+        "ketamine|psilocybin": {
+          risk: "dangerous",
+          summary: "Unpredictable dissociation and anxiety.",
+        },
+        "lsd|mdma": {
+          risk: "caution",
+          summary: "Intensity increases; manage temperature and anxiety.",
+        },
+        "lsd|nitrous": {
+          risk: "caution",
+          summary: "Brief but intense dissociation and confusion.",
+        },
+        "lsd|psilocybin": {
+          risk: "caution",
+          summary: "Very intense experience and nausea risk.",
+        },
+        "mdma|methamphetamine": {
+          risk: "dangerous",
+          summary: "Extreme stimulation and overheating risk.",
+        },
+        "mdma|opioids": {
+          risk: "caution",
+          summary: "Stimulant effects can mask sedation.",
+        },
+        "nitrous|opioids": {
+          risk: "dangerous",
+          summary: "Increased hypoxia and respiratory risk.",
+        },
+        "nitrous|psilocybin": {
+          risk: "caution",
+          summary: "Increased confusion and loss of coordination.",
+        },
+      };
+
+      const severityOrder = {
+        low: 1,
+        caution: 2,
+        dangerous: 3,
+        "do not combine": 4,
+      };
+
+      const substanceById = Object.fromEntries(
+        substances.map((substance) => [substance.id, substance])
+      );
+
+      const displayName = (id) =>
+        substanceById[id] ? substanceById[id].name : id.toUpperCase();
+
+      const substanceList = document.getElementById("substanceList");
+      const detailContent = document.getElementById("detailContent");
+      const searchInput = document.getElementById("search");
+      const categoryFilter = document.getElementById("categoryFilter");
+      const noResults = document.getElementById("noResults");
+      const interactionList = document.getElementById("interactionList");
+      const interactionResult = document.getElementById("interactionResult");
+
+      let activeId = substances[0].id;
+
+      const categoryOptions = [
+        "all",
+        ...new Set(substances.map((substance) => substance.category)),
+      ];
+
+      categoryOptions.forEach((category) => {
+        const option = document.createElement("option");
+        option.value = category;
+        option.textContent =
+          category === "all" ? "All categories" : category;
+        categoryFilter.appendChild(option);
+      });
+
+      const pairKey = (a, b) => {
+        return [a, b].sort().join("|");
+      };
+
+      const renderList = () => {
+        const query = searchInput.value.trim().toLowerCase();
+        const category = categoryFilter.value;
+        const filtered = substances.filter((substance) => {
+          const matchesQuery = substance.name.toLowerCase().includes(query);
+          const matchesCategory =
+            category === "all" || substance.category === category;
+          return matchesQuery && matchesCategory;
+        });
+
+        substanceList.innerHTML = "";
+        filtered.forEach((substance) => {
+          const item = document.createElement("button");
+          item.type = "button";
+          item.className =
+            "list-item" + (substance.id === activeId ? " active" : "");
+          item.setAttribute("role", "listitem");
+          item.innerHTML = `<strong>${substance.name}</strong><span>${substance.category}</span>`;
+          item.addEventListener("click", () => {
+            activeId = substance.id;
+            renderList();
+            renderDetail();
+          });
+          substanceList.appendChild(item);
+        });
+
+        noResults.hidden = filtered.length !== 0;
+      };
+
+      const createDetailBlock = (title, content) => {
+        const block = document.createElement("div");
+        block.className = "detail-block";
+        const heading = document.createElement("h3");
+        heading.textContent = title;
+        block.appendChild(heading);
+        if (Array.isArray(content)) {
+          const list = document.createElement("ul");
+          content.forEach((item) => {
+            const listItem = document.createElement("li");
+            listItem.textContent = item;
+            list.appendChild(listItem);
+          });
+          block.appendChild(list);
+        } else {
+          const paragraph = document.createElement("p");
+          paragraph.textContent = content;
+          block.appendChild(paragraph);
+        }
+        return block;
+      };
+
+      const renderDetail = () => {
+        const substance = substances.find((item) => item.id === activeId);
+        if (!substance) return;
+        detailContent.innerHTML = "";
+        detailContent.appendChild(
+          createDetailBlock("Mechanism of action", substance.mechanism)
+        );
+        detailContent.appendChild(
+          createDetailBlock("Onset", substance.onset)
+        );
+        detailContent.appendChild(
+          createDetailBlock("Duration", substance.duration)
+        );
+        detailContent.appendChild(
+          createDetailBlock("Common dosage ranges", substance.dosage)
+        );
+        detailContent.appendChild(
+          createDetailBlock("Acute risks", substance.acuteRisks)
+        );
+        detailContent.appendChild(
+          createDetailBlock("Harm reduction tips", substance.harmReduction)
+        );
+        detailContent.appendChild(
+          createDetailBlock("Contraindications", substance.contraindications)
+        );
+      };
+
+      const renderInteractions = () => {
+        interactionList.innerHTML = "";
+        substances.forEach((substance) => {
+          const wrapper = document.createElement("label");
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.value = substance.id;
+          checkbox.addEventListener("change", updateInteractionResult);
+          const text = document.createElement("span");
+          text.textContent = substance.name;
+          wrapper.appendChild(checkbox);
+          wrapper.appendChild(text);
+          interactionList.appendChild(wrapper);
+        });
+      };
+
+      const updateInteractionResult = () => {
+        const selected = Array.from(
+          interactionList.querySelectorAll("input:checked")
+        ).map((input) => input.value);
+
+        if (selected.length < 2) {
+          interactionResult.className = "muted";
+          interactionResult.textContent =
+            "Select at least two substances to view interaction risk.";
+          return;
+        }
+
+        let highestRisk = "low";
+        const summaries = [];
+
+        for (let i = 0; i < selected.length; i += 1) {
+          for (let j = i + 1; j < selected.length; j += 1) {
+            const key = pairKey(selected[i], selected[j]);
+            const match = interactions[key];
+            const risk = match ? match.risk : "caution";
+            const summary = match
+              ? match.summary
+              : "Limited data; mixing increases unpredictability.";
+
+            if (severityOrder[risk] > severityOrder[highestRisk]) {
+              highestRisk = risk;
+            }
+            const nameA = displayName(selected[i]);
+            const nameB = displayName(selected[j]);
+            summaries.push(
+              `${nameA} + ${nameB}: ${summary}`
+            );
+          }
+        }
+
+        const summaryLines = summaries.slice(0, 4);
+        const extraCount = summaries.length - summaryLines.length;
+
+        const riskClass =
+          highestRisk === "do not combine"
+            ? "risk-do-not-combine"
+            : `risk-${highestRisk.replace(" ", "-")}`;
+
+        interactionResult.className = "";
+        interactionResult.innerHTML = `
+          <div class="risk-badge ${riskClass}">
+            ${highestRisk.toUpperCase()}
+          </div>
+          <div class="muted">
+            ${summaryLines.join("<br />")}${
+          extraCount > 0
+            ? `<br />+ ${extraCount} more pair${
+                extraCount > 1 ? "s" : ""
+              }.`
+            : ""
+        }
+          </div>
+          <div class="muted" style="margin-top: 6px;">
+            Combining multiple substances increases risk. Prioritize hydration,
+            temperature management, and conservative dosing.
+          </div>
+        `;
+      };
+
+      searchInput.addEventListener("input", renderList);
+      categoryFilter.addEventListener("change", renderList);
+
+      renderList();
+      renderDetail();
+      renderInteractions();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,238 @@
+:root {
+  color-scheme: dark;
+  --bg: #0f1216;
+  --panel: #171c22;
+  --panel-border: #262c35;
+  --text: #e6e9ee;
+  --muted: #a6adb8;
+  --accent: #7fb4ff;
+  --accent-strong: #4d89e9;
+  --focus: #aac8ff;
+  --low: #4cc790;
+  --caution: #f1c563;
+  --dangerous: #f08a5d;
+  --no-combine: #ff5c5c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  background: var(--bg);
+  color: var(--text);
+}
+
+header {
+  padding: 24px 20px 12px;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+header h1 {
+  margin: 0 0 8px;
+  font-size: 1.6rem;
+  letter-spacing: 0.02em;
+}
+
+header p {
+  margin: 0 0 6px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+main {
+  padding: 18px 20px 40px;
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  grid-template-areas:
+    "index detail"
+    "index interaction";
+  gap: 18px;
+  align-items: start;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 10px;
+  padding: 16px;
+  min-height: 300px;
+}
+
+.panel.index {
+  grid-area: index;
+}
+
+.panel.detail {
+  grid-area: detail;
+}
+
+.panel.interaction {
+  grid-area: interaction;
+}
+
+.panel h2 {
+  margin: 0 0 12px;
+  font-size: 1.05rem;
+}
+
+.controls {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--panel-border);
+  background: #0f1318;
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+input:focus,
+select:focus {
+  outline: 2px solid var(--focus);
+  border-color: var(--focus);
+}
+
+.list {
+  display: grid;
+  gap: 8px;
+}
+
+.list-item {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #10151b;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.list-item:hover {
+  border-color: var(--accent);
+}
+
+.list-item.active {
+  border-color: var(--accent-strong);
+  background: #111a24;
+}
+
+.list-item span {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.detail-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.detail-block h3 {
+  margin: 0 0 6px;
+  font-size: 0.95rem;
+  color: var(--accent);
+}
+
+.detail-block p {
+  margin: 0;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.detail-block ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.detail-block li {
+  margin-bottom: 4px;
+}
+
+.pill {
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  color: #0b0e12;
+  background: var(--accent);
+}
+
+.interaction-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.checkbox-list {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.risk-badge {
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  display: inline-block;
+  margin-bottom: 6px;
+}
+
+.risk-low {
+  background: color-mix(in srgb, var(--low) 25%, transparent);
+  color: var(--low);
+  border: 1px solid color-mix(in srgb, var(--low) 50%, transparent);
+}
+
+.risk-caution {
+  background: color-mix(in srgb, var(--caution) 25%, transparent);
+  color: var(--caution);
+  border: 1px solid color-mix(in srgb, var(--caution) 50%, transparent);
+}
+
+.risk-dangerous {
+  background: color-mix(in srgb, var(--dangerous) 25%, transparent);
+  color: var(--dangerous);
+  border: 1px solid color-mix(in srgb, var(--dangerous) 55%, transparent);
+}
+
+.risk-do-not-combine {
+  background: color-mix(in srgb, var(--no-combine) 25%, transparent);
+  color: var(--no-combine);
+  border: 1px solid color-mix(in srgb, var(--no-combine) 55%, transparent);
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 900px) {
+  main {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "index"
+      "detail"
+      "interaction";
+  }
+}

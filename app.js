@@ -112,6 +112,24 @@ const createSection = (title, content) => {
   section.className = "detail-section";
   const heading = document.createElement("h3");
   heading.textContent = title;
+
+  const tooltips = {
+    "Mechanism of action": "How the drug works in your body at a molecular level",
+    "Onset and duration": "When effects start and how long they last",
+    "Dosage ranges": "Amount guidelines: Threshold (barely noticeable) → Strong (intense)",
+    "Acute risks": "Immediate dangers and short-term health effects",
+    "Harm reduction checklist": "Safer practices to reduce risk of harm",
+    "Contraindications": "Medical conditions or drugs that make this unsafe to use"
+  };
+
+  if (tooltips[title]) {
+    const icon = document.createElement("span");
+    icon.className = "info-icon";
+    icon.textContent = "?";
+    icon.setAttribute("data-tooltip", tooltips[title]);
+    heading.appendChild(icon);
+  }
+
   section.appendChild(heading);
   section.appendChild(content);
   return section;

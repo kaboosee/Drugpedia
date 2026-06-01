@@ -42,7 +42,7 @@ header {
 
 header h1 {
   margin: 0 0 8px;
-  font-size: 1rem;
+  font-size: 1.5rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
 }
@@ -50,9 +50,21 @@ header h1 {
 header p {
   margin: 0 0 6px;
   color: var(--muted);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   line-height: 1.4;
   max-width: 90ch;
+}
+
+header p:last-child {
+  margin: 0;
+}
+
+.emergency-numbers {
+  display: block;
+  margin-top: 6px;
+  font-weight: 500;
+  color: #ff9999;
+  font-size: 0.8rem;
 }
 
 main {
@@ -63,6 +75,10 @@ main {
   align-items: start;
   flex: 1;
   min-height: 0;
+}
+
+.mobile-tabs {
+  display: none;
 }
 
 .panel {
@@ -151,6 +167,15 @@ option {
   color: var(--text);
   font-family: inherit;
   text-align: left;
+  min-width: 0;
+}
+
+.list-item span:first-child {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .list-item:hover {
@@ -166,6 +191,8 @@ option {
   text-transform: uppercase;
   letter-spacing: 0.12em;
   color: var(--muted);
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .detail-content {
@@ -173,11 +200,14 @@ option {
   gap: 10px;
   overflow: auto;
   padding-right: 4px;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .detail-section {
   border-top: 1px solid var(--border);
   padding-top: 8px;
+  position: relative;
 }
 
 .detail-section:first-child {
@@ -191,6 +221,46 @@ option {
   text-transform: uppercase;
   letter-spacing: 0.16em;
   color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.detail-section h3 .info-icon {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  background: var(--border);
+  border-radius: 50%;
+  text-align: center;
+  line-height: 14px;
+  font-size: 10px;
+  color: var(--text);
+  cursor: help;
+  position: relative;
+}
+
+.detail-section h3 .info-icon:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1a1a;
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid var(--accent);
+  font-size: 0.75rem;
+  text-transform: none;
+  letter-spacing: normal;
+  white-space: normal;
+  max-width: 200px;
+  width: 200px;
+  z-index: 100;
+  font-weight: normal;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
 }
 
 .detail-section p {
@@ -349,6 +419,8 @@ option {
     display: none;
     grid-column: 1;
     grid-row: 2;
+    padding: 10px;
+    overflow: hidden;
   }
 
   .panel.active {
@@ -375,5 +447,24 @@ option {
 
   .detail-content {
     max-height: calc(100vh - 200px);
+  }
+
+  .data-table {
+    font-size: 0.75rem;
+    display: block;
+    overflow-x: auto;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 4px 6px;
+  }
+
+  .detail-section h3 {
+    font-size: 0.65rem;
+  }
+
+  .panel h2 {
+    font-size: 0.65rem;
   }
 }

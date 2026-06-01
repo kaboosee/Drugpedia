@@ -7,8 +7,12 @@ window.substances = [
       "Primarily increases serotonin release and reuptake inhibition, with secondary dopamine and norepinephrine effects.",
     onset: "Oral: 30–60 min. Insufflated: 5–15 min.",
     duration: "Total: 4–6 h (after-effects 1–2 days possible).",
-    dosage:
-      "Oral common range: 75–125 mg. Redosing increases neurotoxicity and dehydration risk.",
+    dosage: {
+      threshold: "50 mg",
+      light: "60 mg",
+      common: "75–125 mg",
+      strong: "150+ mg"
+    },
     effects: [
       "Empathy and emotional openness",
       "Increased energy and sociability",
@@ -37,7 +41,12 @@ window.substances = [
       "Blocks reuptake of dopamine, norepinephrine, and serotonin, increasing synaptic levels.",
     onset: "Insufflated: 1–5 min. Smoked: seconds.",
     duration: "15–45 min with strong cravings after.",
-    dosage: "Insufflated common range: 20–60 mg per line.",
+    dosage: {
+      threshold: "10 mg",
+      light: "15 mg",
+      common: "20–60 mg",
+      strong: "80+ mg"
+    },
     effects: [
       "Euphoria and confidence",
       "Increased alertness and talkativeness",
@@ -66,7 +75,12 @@ window.substances = [
       "Serotonergic psychedelic with 5-HT2A agonism and mild stimulant effects.",
     onset: "Oral: 45–90 min.",
     duration: "4–6 h (after-effects 1–3 h).",
-    dosage: "Oral common range: 10–25 mg.",
+    dosage: {
+      threshold: "5 mg",
+      light: "8 mg",
+      common: "10–25 mg",
+      strong: "30+ mg"
+    },
     effects: [
       "Visual enhancement and color saturation",
       "Tactile or physical euphoria",
@@ -95,7 +109,12 @@ window.substances = [
       "THC is a partial CB1/CB2 agonist, altering neurotransmitter release and perception.",
     onset: "Inhaled: 1–5 min. Oral: 30–120 min.",
     duration: "Inhaled: 2–4 h. Oral: 4–8 h.",
-    dosage: "Inhaled: 1–3 small inhalations. Oral: 2.5–10 mg THC.",
+    dosage: {
+      threshold: "1 mg THC",
+      light: "2.5 mg",
+      common: "5–10 mg",
+      strong: "15+ mg"
+    },
     effects: [
       "Relaxation or euphoria",
       "Altered time perception",
@@ -124,7 +143,12 @@ window.substances = [
       "Enhances GABA activity and inhibits glutamate, causing sedation and impaired judgment.",
     onset: "10–30 min.",
     duration: "1–6 h depending on dose.",
-    dosage: "Standard drink: ~14 g ethanol (varies by beverage and pour).",
+    dosage: {
+      threshold: "1 drink",
+      light: "1–2 drinks",
+      common: "2–4 drinks",
+      strong: "4+ drinks"
+    },
     effects: [
       "Disinhibition and relaxation",
       "Impaired coordination and judgment",
@@ -153,7 +177,12 @@ window.substances = [
       "NMDA receptor antagonist leading to dissociation and analgesia.",
     onset: "Insufflated: 5–15 min. IM: 1–5 min.",
     duration: "45–90 min (after-effects 1–2 h).",
-    dosage: "Insufflated common range: 20–60 mg.",
+    dosage: {
+      threshold: "10 mg",
+      light: "15 mg",
+      common: "20–60 mg",
+      strong: "80+ mg"
+    },
     effects: [
       "Dissociation and analgesia",
       "Dreamlike visuals or detachment",
@@ -182,7 +211,12 @@ window.substances = [
       "Potent 5-HT2A agonist producing long-lasting psychedelic effects.",
     onset: "Oral/sublingual: 30–90 min.",
     duration: "8–12 h (after-effects 2–4 h).",
-    dosage: "Common range: 50–150 µg (potency varies widely).",
+    dosage: {
+      threshold: "25 µg",
+      light: "50 µg",
+      common: "75–150 µg",
+      strong: "200+ µg"
+    },
     effects: [
       "Visual distortions and tracers",
       "Altered thought patterns",
@@ -211,7 +245,12 @@ window.substances = [
       "Psilocin activates 5-HT2A receptors, altering perception and mood.",
     onset: "Oral: 20–60 min.",
     duration: "4–6 h (after-effects 1–2 h).",
-    dosage: "Dried mushrooms common range: 1–3 g (potency varies).",
+    dosage: {
+      threshold: "0.5 g",
+      light: "1 g",
+      common: "1.5–3 g",
+      strong: "3.5+ g"
+    },
     effects: [
       "Visual changes and patterning",
       "Emotional openness",
@@ -240,7 +279,12 @@ window.substances = [
       "Releases dopamine and norepinephrine and inhibits reuptake.",
     onset: "Oral: 20–60 min. Insufflated: 5–15 min.",
     duration: "4–8 h.",
-    dosage: "Oral common range: 10–30 mg (purity varies).",
+    dosage: {
+      threshold: "5 mg",
+      light: "10 mg",
+      common: "15–30 mg",
+      strong: "40+ mg"
+    },
     effects: [
       "Increased energy and focus",
       "Appetite suppression",
@@ -269,7 +313,12 @@ window.substances = [
       "Very potent monoamine releaser (dopamine, norepinephrine, serotonin).",
     onset: "Smoked: seconds. Oral: 20–60 min.",
     duration: "8–14 h (after-effects longer).",
-    dosage: "Oral common range: 5–20 mg (very potent).",
+    dosage: {
+      threshold: "3 mg",
+      light: "5 mg",
+      common: "10–20 mg",
+      strong: "25+ mg"
+    },
     effects: [
       "Strong stimulation and euphoria",
       "Prolonged wakefulness",
@@ -298,7 +347,12 @@ window.substances = [
       "Enhance GABA-A activity, producing sedation and anxiolysis.",
     onset: "Oral: 20–60 min (varies by compound).",
     duration: "6–24 h depending on compound.",
-    dosage: "Varies widely by compound; use the lowest effective dose.",
+    dosage: {
+      threshold: "2–5 mg",
+      light: "5–10 mg",
+      common: "10–20 mg",
+      strong: "30+ mg"
+    },
     effects: [
       "Anxiolysis and sedation",
       "Memory impairment",
@@ -327,8 +381,12 @@ window.substances = [
       "Mu-opioid receptor agonism leading to analgesia and sedation.",
     onset: "Oral: 20–60 min.",
     duration: "3–6 h (varies by compound).",
-    dosage:
-      "Oral common range: 5–15 mg oxycodone-equivalent (tolerance varies).",
+    dosage: {
+      threshold: "5 mg",
+      light: "5–10 mg",
+      common: "10–15 mg",
+      strong: "20+ mg"
+    },
     effects: [
       "Analgesia and warmth",
       "Sedation or nodding",
@@ -357,7 +415,12 @@ window.substances = [
       "GABA-B agonist; GBL converts to GHB with strong sedative effects.",
     onset: "10–30 min.",
     duration: "2–4 h.",
-    dosage: "GHB: 1–3 g or GBL: 0.5–1.5 mL (concentration varies).",
+    dosage: {
+      threshold: "0.5 g",
+      light: "1 g",
+      common: "1.5–3 g",
+      strong: "3.5+ g"
+    },
     effects: [
       "Relaxation and euphoria",
       "Disinhibition",
@@ -386,7 +449,12 @@ window.substances = [
       "Short-acting NMDA antagonism with dissociative effects.",
     onset: "Seconds.",
     duration: "1–3 min.",
-    dosage: "Common range: 1 balloon with breaks between uses.",
+    dosage: {
+      threshold: "0.5 balloon",
+      light: "1 balloon",
+      common: "1–2 balloons",
+      strong: "3+ balloons"
+    },
     effects: [
       "Brief dissociation and euphoria",
       "Auditory or visual distortion",
@@ -415,7 +483,12 @@ window.substances = [
       "NMDA antagonist with sigma-1 and serotonergic effects.",
     onset: "30–90 min.",
     duration: "4–8 h.",
-    dosage: "Common range: 100–300 mg DXM base (formulation matters).",
+    dosage: {
+      threshold: "75 mg",
+      light: "100 mg",
+      common: "150–300 mg",
+      strong: "400+ mg"
+    },
     effects: [
       "Dissociation and floating sensation",
       "Visual distortion",

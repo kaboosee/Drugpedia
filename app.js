@@ -329,6 +329,32 @@ if (interactionB) {
   interactionB.addEventListener("change", updateInteractionResult);
 }
 
+// Mobile tab switching
+const mobileTabs = document.getElementById("mobileTabs");
+if (mobileTabs) {
+  const tabButtons = mobileTabs.querySelectorAll(".mobile-tab-btn");
+  const panels = document.querySelectorAll(".panel");
+
+  tabButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const tabName = btn.getAttribute("data-tab");
+
+      tabButtons.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      panels.forEach((panel) => panel.classList.remove("active"));
+
+      if (tabName === "substances") {
+        document.querySelector(".panel.sidebar").classList.add("active");
+      } else if (tabName === "detail") {
+        document.querySelector(".panel.detail").classList.add("active");
+      } else if (tabName === "interaction") {
+        document.querySelector(".panel.interaction").classList.add("active");
+      }
+    });
+  });
+}
+
 renderList();
 renderDetail();
 populateInteractionSelects();

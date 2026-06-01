@@ -4,9 +4,6 @@ on:
   push:
     branches: [ master, main ]
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -15,14 +12,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: github-pages
-          path: |
-            index.html
-            app.js
-            data.js
-            styles.css
+          path: .
+          # uploads your index.html, css, js automatically
 
   deploy:
     needs: build
@@ -31,6 +24,7 @@ jobs:
       contents: read
       pages: write
       id-token: write
+
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -39,3 +33,4 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+``

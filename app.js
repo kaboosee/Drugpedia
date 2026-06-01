@@ -22,36 +22,198 @@ const detailContent = document.getElementById("detailContent");
 const searchInput = document.getElementById("search");
 const categoryFilter = document.getElementById("categoryFilter");
 const noResults = document.getElementById("noResults");
-const interactionList = document.getElementById("interactionList");
-const interactionResult = document.getElementById("interactionResult");
+const interactionA = document.getElementById("interactionA");
+const interactionB = document.getElementById("interactionB");
+const interactionBadge = document.getElementById("interactionBadge");
+const interactionSummary = document.getElementById("interactionSummary");
 
 let activeId = substances.length ? substances[0].id : "";
 
-const categoryOptions = [
-  "all",
-  ...new Set(substances.map((substance) => substance.category)),
-];
+const categoryLabels = {
+  stimulants: "Stimulants",
+  psychedelics: "Psychedelics",
+  dissociatives: "Dissociatives",
+  depressants: "Depressants",
+  empathogens: "Empathogens",
+};
 
-categoryOptions.forEach((category) => {
-  const option = document.createElement("option");
-  option.value = category;
-  option.textContent = category === "all" ? "All categories" : category;
-  categoryFilter.appendChild(option);
-});
+const normalizeCategory = (substance) => {
+  const raw = (substance.category || "").toLowerCase();
+  if (raw.includes("entactogen") || raw.includes("empathogen")) {
+    return "empathogens";
+  }
+  if (raw.includes("stimulant")) {
+    return "stimulants";
+  }
+  if (raw.includes("psychedelic")) {
+    return "psychedelics";
+  }
+  if (raw.includes("dissociative")) {
+    return "dissociatives";
+  }
+  if (raw.includes("depressant") || raw.includes("opioid")) {
+    return "depressants";
+  }
+  if (raw.includes("cannabinoid")) {
+    return "depressants";
+  }
+  return "stimulants";
+};
 
 const pairKey = (a, b) => {
   return [a, b].sort().join("|");
 };
 
+const createList = (items, className) => {
+  const list = document.createElement("ul");
+  list.className = className || "";
+  if (!Array.isArray(items) || items.length === 0) {
+    const empty = document.createElement("li");
+    empty.textContent = "Not available.";
+    list.appendChild(empty);
+    return list;
+  }
+  items.forEach((item) => {
+    const listItem = document.createElement("li");
+    listItem.textContent = item;
+    list.appendChild(listItem);
+  });
+  return list;
+};
+
+const createTable = (headers, rows) => {
+  const table = document.createElement("table");
+  table.className = "data-table";
+  const head = document.createElement("thead");
+  const headRow = document.createElement("tr");
+  headers.forEach((header) => {
+    const cell = document.createElement("th");
+    cell.textContent = header;
+    headRow.appendChild(cell);
+  });
+  head.appendChild(headRow);
+  const body = document.createElement("tbody");
+  rows.forEach((row) => {
+    const rowEl = document.createElement("tr");
+    row.forEach((value) => {
+      const cell = document.createElement("td");
+      cell.textContent = value;
+      rowEl.appendChild(cell);
+    });
+    body.appendChild(rowEl);
+  });
+  table.appendChild(head);
+  table.appendChild(body);
+  return table;
+};
+
+const createSection = (title, content) => {
+  const section = document.createElement("section");
+  section.className = "detail-section";
+  const heading = document.createElement("h3");
+  heading.textContent = title;
+  section.appendChild(heading);
+  section.appendChild(content);
+  return section;
+};
+
+const extractCommonRange = (text) => {
+  if (!text) {
+    return "-";
+  }
+  const match = text.match(/common range:([^.]*)/i);
+  if (match && match[1]) {
+    return match[1].trim();
+  }
+  return text;
+};
+
+const normalizeDosage = (dosage) => {
+  if (dosage && typeof dosage === "object") {
+    return {
+      threshold: dosage.threshold || "-",
+      light: dosage.light || "-",
+      common: dosage.common || "-",
+      strong: dosage.strong || "-",
+    };
+  }
+  if (typeof dosage === "string") {
+    return {
+      threshold: "-",
+      light: "-",
+      common: extractCommonRange(dosage),
+      strong: "-",
+    };
+  }
+  return { threshold: "-", light: "-", common: "-", strong: "-" };
+};
+
+const renderEmptyDetail = (message) => {
+  detailContent.innerHTML = "";
+  const empty = document.createElement("p");
+  empty.className = "muted";
+  empty.textContent = message;
+  detailContent.appendChild(empty);
+};
+
+const renderDetail = () => {
+  const substance = substanceById[activeId];
+  if (!substance) {
+    renderEmptyDetail("Select a substance to view details.");
+    return;
+  }
+
+  detailContent.innerHTML = "";
+
+  const mechanism = document.createElement("p");
+  mechanism.textContent = substance.mechanism || "Not available.";
+  detailContent.appendChild(
+    createSection("Mechanism of action", mechanism)
+  );
+
+  const onsetDurationTable = createTable(
+    ["Metric", "Value"],
+    [
+      ["Onset", substance.onset || "-"],
+      ["Duration", substance.duration || "-"],
+    ]
+  );
+  detailContent.appendChild(
+    createSection("Onset and duration", onsetDurationTable)
+  );
+
+  const dosage = normalizeDosage(substance.dosage);
+  const dosageTable = createTable(
+    ["Threshold", "Light", "Common", "Strong"],
+    [[dosage.threshold, dosage.light, dosage.common, dosage.strong]]
+  );
+  detailContent.appendChild(createSection("Dosage ranges", dosageTable));
+
+  detailContent.appendChild(
+    createSection("Acute risks", createList(substance.acuteRisks))
+  );
+  detailContent.appendChild(
+    createSection(
+      "Harm reduction checklist",
+      createList(substance.harmReduction, "checklist")
+    )
+  );
+  detailContent.appendChild(
+    createSection("Contraindications", createList(substance.contraindications))
+  );
+};
+
 const renderList = () => {
   const query = searchInput.value.trim().toLowerCase();
   const category = categoryFilter.value;
-  const filtered = substances.filter((substance) => {
-    const matchesQuery = substance.name.toLowerCase().includes(query);
-    const matchesCategory =
-      category === "all" || substance.category === category;
-    return matchesQuery && matchesCategory;
-  });
+  const filtered = substances
+    .filter((substance) => {
+      const matchesQuery = substance.name.toLowerCase().includes(query);
+      const group = normalizeCategory(substance);
+      const matchesCategory = category === "all" || group === category;
+      return matchesQuery && matchesCategory;
+    })
+    .sort((left, right) => left.name.localeCompare(right.name));
 
   substanceList.innerHTML = "";
   filtered.forEach((substance) => {
@@ -60,7 +222,11 @@ const renderList = () => {
     item.className =
       "list-item" + (substance.id === activeId ? " active" : "");
     item.setAttribute("role", "listitem");
-    item.innerHTML = `<strong>${substance.name}</strong><span>${substance.category}</span>`;
+    const group = normalizeCategory(substance);
+    item.innerHTML = `
+      <span>${substance.name}</span>
+      <span class="list-meta">${categoryLabels[group]}</span>
+    `;
     item.addEventListener("click", () => {
       activeId = substance.id;
       renderList();
@@ -70,137 +236,100 @@ const renderList = () => {
   });
 
   noResults.hidden = filtered.length !== 0;
-};
-
-const createDetailBlock = (title, content) => {
-  const block = document.createElement("div");
-  block.className = "detail-block";
-  const heading = document.createElement("h3");
-  heading.textContent = title;
-  block.appendChild(heading);
-  if (Array.isArray(content)) {
-    const list = document.createElement("ul");
-    content.forEach((item) => {
-      const listItem = document.createElement("li");
-      listItem.textContent = item;
-      list.appendChild(listItem);
-    });
-    block.appendChild(list);
-  } else {
-    const paragraph = document.createElement("p");
-    paragraph.textContent = content;
-    block.appendChild(paragraph);
-  }
-  return block;
-};
-
-const renderDetail = () => {
-  const substance = substances.find((item) => item.id === activeId);
-  if (!substance) return;
-  detailContent.innerHTML = "";
-  detailContent.appendChild(
-    createDetailBlock("Mechanism of action", substance.mechanism)
-  );
-  detailContent.appendChild(createDetailBlock("Onset", substance.onset));
-  detailContent.appendChild(createDetailBlock("Duration", substance.duration));
-  detailContent.appendChild(
-    createDetailBlock("Common dosage ranges", substance.dosage)
-  );
-  if (substance.effects) {
-    detailContent.appendChild(
-      createDetailBlock("Reported effects (summary)", substance.effects)
-    );
-  }
-  detailContent.appendChild(
-    createDetailBlock("Acute risks", substance.acuteRisks)
-  );
-  detailContent.appendChild(
-    createDetailBlock("Harm reduction tips", substance.harmReduction)
-  );
-  detailContent.appendChild(
-    createDetailBlock("Contraindications", substance.contraindications)
-  );
-};
-
-const renderInteractions = () => {
-  interactionList.innerHTML = "";
-  substances.forEach((substance) => {
-    const wrapper = document.createElement("label");
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.value = substance.id;
-    checkbox.addEventListener("change", updateInteractionResult);
-    const text = document.createElement("span");
-    text.textContent = substance.name;
-    wrapper.appendChild(checkbox);
-    wrapper.appendChild(text);
-    interactionList.appendChild(wrapper);
-  });
-};
-
-const updateInteractionResult = () => {
-  const selected = Array.from(
-    interactionList.querySelectorAll("input:checked")
-  ).map((input) => input.value);
-
-  if (selected.length < 2) {
-    interactionResult.className = "muted";
-    interactionResult.textContent =
-      "Select at least two substances to view interaction risk.";
+  if (filtered.length === 0) {
+    activeId = "";
+    renderDetail();
     return;
   }
 
-  let highestRisk = "low";
-  const summaries = [];
+  if (!filtered.some((item) => item.id === activeId)) {
+    activeId = filtered[0].id;
+    renderDetail();
+  }
+};
 
-  for (let i = 0; i < selected.length; i += 1) {
-    for (let j = i + 1; j < selected.length; j += 1) {
-      const key = pairKey(selected[i], selected[j]);
-      const match = interactions[key];
-      const risk = match ? match.risk : "caution";
-      const summary = match
-        ? match.summary
-        : "Limited data; mixing increases unpredictability.";
-
-      if (severityOrder[risk] > severityOrder[highestRisk]) {
-        highestRisk = risk;
-      }
-      const nameA = displayName(selected[i]);
-      const nameB = displayName(selected[j]);
-      summaries.push(`${nameA} + ${nameB}: ${summary}`);
+const populateInteractionSelects = () => {
+  const sorted = [...substances].sort((left, right) =>
+    left.name.localeCompare(right.name)
+  );
+  const buildSelect = (select, placeholder) => {
+    if (!select) {
+      return;
     }
+    select.innerHTML = "";
+    const placeholderOption = document.createElement("option");
+    placeholderOption.value = "";
+    placeholderOption.textContent = placeholder;
+    select.appendChild(placeholderOption);
+    sorted.forEach((substance) => {
+      const option = document.createElement("option");
+      option.value = substance.id;
+      option.textContent = substance.name;
+      select.appendChild(option);
+    });
+  };
+
+  buildSelect(interactionA, "Select substance A");
+  buildSelect(interactionB, "Select substance B");
+};
+
+const updateInteractionResult = () => {
+  if (!interactionA || !interactionB) {
+    return;
+  }
+  const valueA = interactionA.value;
+  const valueB = interactionB.value;
+
+  const setNeutral = (message) => {
+    interactionBadge.textContent = "Select two substances";
+    interactionBadge.className = "risk-badge risk-neutral";
+    interactionSummary.textContent = message;
+  };
+
+  if (!valueA || !valueB) {
+    setNeutral("Choose two substances to see interaction risk.");
+    return;
+  }
+  if (valueA === valueB) {
+    setNeutral("Select two different substances.");
+    return;
   }
 
-  const summaryLines = summaries.slice(0, 4);
-  const extraCount = summaries.length - summaryLines.length;
+  const match = interactions[pairKey(valueA, valueB)];
+  const risk = match ? match.risk : "caution";
+  const summary = match
+    ? match.summary
+    : "Limited data; mixing increases unpredictability.";
 
-  const riskClass =
-    highestRisk === "do not combine"
-      ? "risk-do-not-combine"
-      : `risk-${highestRisk.replace(" ", "-")}`;
+  const labels = {
+    low: "SAFE",
+    caution: "CAUTION",
+    dangerous: "DANGEROUS",
+    "do not combine": "DO NOT COMBINE",
+  };
 
-  interactionResult.className = "";
-  interactionResult.innerHTML = `
-    <div class="risk-badge ${riskClass}">
-      ${highestRisk.toUpperCase()}
-    </div>
-    <div class="muted">
-      ${summaryLines.join("<br />")}${
-    extraCount > 0
-      ? `<br />+ ${extraCount} more pair${extraCount > 1 ? "s" : ""}.`
-      : ""
-  }
-    </div>
-    <div class="muted" style="margin-top: 6px;">
-      Combining multiple substances increases risk. Prioritize hydration,
-      temperature management, and conservative dosing.
-    </div>
-  `;
+  const classes = {
+    low: "risk-safe",
+    caution: "risk-caution",
+    dangerous: "risk-dangerous",
+    "do not combine": "risk-do-not-combine",
+  };
+
+  interactionBadge.textContent = labels[risk] || "CAUTION";
+  interactionBadge.className = `risk-badge ${classes[risk] || "risk-caution"}`;
+  interactionSummary.textContent = summary;
 };
 
 searchInput.addEventListener("input", renderList);
 categoryFilter.addEventListener("change", renderList);
+if (interactionA) {
+  interactionA.addEventListener("change", updateInteractionResult);
+}
+if (interactionB) {
+  interactionB.addEventListener("change", updateInteractionResult);
+}
 
 renderList();
 renderDetail();
-renderInteractions();
+populateInteractionSelects();
+updateInteractionResult();

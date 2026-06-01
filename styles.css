@@ -64,6 +64,7 @@ header p:last-child {
   margin-top: 6px;
   font-weight: 500;
   color: #ff9999;
+  text-shadow: 0 0 8px #FF1744;
   font-size: 0.8rem;
 }
 

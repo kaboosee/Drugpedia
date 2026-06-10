@@ -8,9 +8,12 @@ interaction checker. Compiled from [TripSit](https://tripsit.me/),
 
 **Live site:** https://kaboosee.github.io/Drugpedia/
 
+_Last updated: 10 June 2026 (drug data compiled from the TripSit snapshot in
+[`data/tripsit-raw.json`](data/tripsit-raw.json))._
+
 > **Disclaimer:** This is harm reduction guidance, not medical advice. It is
 > for personal education only. If in doubt or unwell, seek medical help
-> (UK: 111 / 999 · US: 911 · EU: 112 · AU: 000 · NZ: 111).
+> (UK: 999 · US: 911 · EU: 112 · AU: 000 · NZ: 111).
 
 ## Features
 

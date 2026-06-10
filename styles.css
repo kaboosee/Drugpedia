@@ -52,29 +52,17 @@
   box-sizing: border-box;
 }
 
-/* Thin, themed scrollbars so the in-panel overflow regions don't show
-   chunky default OS bars (Firefox + WebKit/Blink). */
+/* Hide scrollbars entirely while keeping scroll/overflow behaviour
+   (Firefox + WebKit/Blink). */
 * {
-  scrollbar-width: thin;
-  scrollbar-color: var(--border) transparent;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--muted);
+  width: 0;
+  height: 0;
+  display: none;
 }
 
 html,

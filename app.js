@@ -82,7 +82,7 @@ if (mobileTabs) {
     if (panel) {
       panel.classList.add("active");
     }
-    document.body.classList.remove("scrolled");
+    window.scrollTo(0, 0);
   };
 
   tabButtons.forEach((btn, index) => {
@@ -108,14 +108,26 @@ if (mobileTabs) {
   });
 }
 
-// On mobile, shrink the header as the user scrolls a panel to free up room
-// (styling keys off `body.scrolled`; only active under the mobile breakpoint).
-[detailContent, substanceList].filter(Boolean).forEach((el) => {
-  el.addEventListener(
-    "scroll",
-    () => document.body.classList.toggle("scrolled", el.scrollTop > 16),
-    { passive: true },
-  );
+// Info tooltips: tap the (?) to open it, tap anywhere else to close. Touch
+// devices have no hover, so without this the CSS tooltip would have no way to
+// be dismissed. Hover still works on pointer devices (see styles.css).
+detailContent.addEventListener("click", (event) => {
+  const icon = event.target.closest(".info-icon");
+  const open = detailContent.querySelectorAll(".info-icon.tooltip-open");
+  open.forEach((el) => {
+    if (el !== icon) {
+      el.classList.remove("tooltip-open");
+    }
+  });
+  if (icon) {
+    event.stopPropagation();
+    icon.classList.toggle("tooltip-open");
+  }
+});
+document.addEventListener("click", () => {
+  detailContent
+    .querySelectorAll(".info-icon.tooltip-open")
+    .forEach((el) => el.classList.remove("tooltip-open"));
 });
 
 // ---- DOM builders ----
@@ -479,7 +491,7 @@ const initApp = (data) => {
             renderList();
             renderDetail();
             collapse();
-            detailContent.scrollTop = 0;
+            window.scrollTo(0, 0);
           });
           li.appendChild(btn);
           results.appendChild(li);

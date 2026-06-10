@@ -396,8 +396,7 @@ option {
   outline-offset: 1px;
 }
 
-.detail-section h3 .info-icon:hover::after,
-.detail-section h3 .info-icon:focus-visible::after {
+.detail-section h3 .info-icon::after {
   content: attr(data-tooltip);
   position: absolute;
   top: 125%;
@@ -418,6 +417,22 @@ option {
   font-weight: normal;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
   pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Tap-to-toggle on touch (tooltip-open), keyboard focus, or real hover. */
+.detail-section h3 .info-icon.tooltip-open::after,
+.detail-section h3 .info-icon:focus-visible::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (hover: hover) {
+  .detail-section h3 .info-icon:hover::after {
+    opacity: 1;
+    visibility: visible;
+  }
 }
 
 .detail-section p {
@@ -795,11 +810,11 @@ option {
 }
 
 @media (max-width: 640px) {
+  /* Scroll the document (not a nested panel) so iOS Safari collapses its
+     toolbars and the full screen is used. The header scrolls away naturally;
+     the tabs stay pinned at the top. */
   main {
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
-    gap: 0;
+    display: block;
     padding: 0;
   }
 
@@ -809,6 +824,9 @@ option {
     gap: 0;
     border-bottom: 1px solid var(--border);
     background: var(--panel);
+    position: sticky;
+    top: 0;
+    z-index: 10;
   }
 
   .mobile-tab-btn {
@@ -835,10 +853,8 @@ option {
 
   .panel {
     display: none;
-    grid-column: 1;
-    grid-row: 2;
     padding: 10px;
-    overflow: hidden;
+    overflow: visible;
   }
 
   .panel.active {
@@ -884,30 +900,16 @@ option {
     margin: 0 0 4px;
   }
 
-  /* Scrolling a panel shrinks the header to free up room (see body.scrolled
-     toggle in app.js). */
-  body.scrolled header {
-    padding-top: 6px;
-    padding-bottom: 6px;
-  }
-
-  body.scrolled header h1 {
-    font-size: 0.75rem;
-    margin: 0;
-  }
-
-  body.scrolled header p,
-  body.scrolled .theme-toggle {
-    display: none;
-  }
-
+  /* Panels grow with their content; the document scrolls, not the panel. */
   .list {
-    max-height: calc(100vh - 200px);
+    max-height: none;
+    overflow: visible;
   }
 
   /* Center the whole profile on narrow screens. */
   .detail-content {
-    max-height: calc(100vh - 200px);
+    max-height: none;
+    overflow: visible;
     text-align: center;
   }
 

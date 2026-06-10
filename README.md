@@ -92,8 +92,5 @@ returning visitors keep the old cached assets.
 
 - [`data/tripsit-raw.json`](data/tripsit-raw.json) is the committed TripSit
   snapshot used by the build; refresh it with `node scripts/fetch-tripsit.js`.
-- [`frank_drugs.json`](frank_drugs.json) is older structured source data
-  scraped from Talk to Frank. It is kept for provenance but is **not** deployed
-  or loaded by the site (`scripts/fetch-frank.js` / `scripts/enrich-data.js`).
 - [`logic.js`](logic.js) holds the pure, testable logic (filtering, category
   normalisation, interaction lookup); [`app.js`](app.js) holds DOM wiring.

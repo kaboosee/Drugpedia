@@ -30,7 +30,6 @@ Script loading order in `index.html`: `logic.js` → `app.js` (plain browser scr
 - **`logic.js`** — pure, testable logic (filtering, category normalisation, interaction lookup, dosage normalisation). UMD-style wrapper: exposes `window.DrugpediaLogic` in the browser and `module.exports` under Node (how tests import it). **Pure logic goes here, never in app.js.**
 - **`app.js`** — DOM wiring only (async data fetch + bootstrap, rendering, event listeners, theme toggle, keyboard shortcuts, mobile tabs, service worker registration). Destructures everything it needs from `window.DrugpediaLogic`.
 - **`sw.js`** — service worker for offline/PWA. Network-first for navigations, cache-first for assets (including `data/drugs.json`).
-- **`frank_drugs.json`** / `scripts/fetch-frank.js` / `scripts/enrich-data.js` — older Talk to Frank source data and its merge script; kept for provenance, **not** part of the current build.
 
 Tests (`tests/`, `node:test` + `node:assert/strict`): `logic.test.js` requires `logic.js` directly; `data.test.js` `JSON.parse`s `data/drugs.json` and enforces data integrity (unique ids, required snake_case fields, list fields are arrays, 5-key `dosage_ranges`, valid per-drug interaction severities, sorted `|`-joined pairwise keys, valid risk levels). Run `npm test` after any data or schema change.
 

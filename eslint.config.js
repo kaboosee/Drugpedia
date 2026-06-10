@@ -4,7 +4,7 @@ const prettier = require("eslint-config-prettier");
 
 module.exports = [
   {
-    ignores: ["node_modules/", "frank_drugs.json", "package-lock.json"],
+    ignores: ["node_modules/", "package-lock.json"],
   },
   js.configs.recommended,
   prettier,

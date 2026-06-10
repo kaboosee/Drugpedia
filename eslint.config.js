@@ -21,7 +21,7 @@ module.exports = [
     },
   },
   {
-    files: ["tests/**/*.js", "eslint.config.js"],
+    files: ["tests/**/*.js", "scripts/**/*.js", "eslint.config.js"],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: "commonjs",

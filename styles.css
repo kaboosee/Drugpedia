@@ -450,6 +450,29 @@ option {
   font-size: 0.8rem;
 }
 
+/* Desktop: pin the layout to the viewport so the substance list and detail
+   scroll inside their panels instead of growing the page. */
+@media (min-width: 901px) {
+  body {
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  main {
+    min-height: 0;
+    align-items: stretch;
+  }
+
+  .panel {
+    overflow: hidden;
+  }
+
+  .detail-content {
+    flex: 1;
+    min-height: 0;
+  }
+}
+
 @media (max-width: 900px) {
   main {
     grid-template-columns: 1fr;

@@ -16,13 +16,24 @@ const {
 test("normalizeCategory maps raw categories to filter groups", () => {
   assert.equal(normalizeCategory({ category: "Stimulant" }), "stimulants");
   assert.equal(normalizeCategory({ category: "Psychedelic" }), "psychedelics");
+  assert.equal(normalizeCategory({ category: "Hallucinogen" }), "psychedelics");
   assert.equal(
     normalizeCategory({ category: "Dissociative" }),
     "dissociatives",
   );
   assert.equal(normalizeCategory({ category: "Depressant" }), "depressants");
   assert.equal(normalizeCategory({ category: "Opioid" }), "depressants");
+  assert.equal(
+    normalizeCategory({ category: "Synthetic opioid" }),
+    "depressants",
+  );
+  assert.equal(
+    normalizeCategory({ category: "Opiate/opioid painkillers" }),
+    "depressants",
+  );
+  assert.equal(normalizeCategory({ category: "Inhalant" }), "depressants");
   assert.equal(normalizeCategory({ category: "Cannabinoid" }), "depressants");
+  assert.equal(normalizeCategory({ category: "Cannabis" }), "depressants");
   assert.equal(normalizeCategory({ category: "Empathogen" }), "empathogens");
 });
 
@@ -33,9 +44,12 @@ test("normalizeCategory: entactogen wins over stimulant in combined labels", () 
   );
 });
 
-test("normalizeCategory falls back to stimulants for unknown or missing", () => {
-  assert.equal(normalizeCategory({ category: "Something else" }), "stimulants");
-  assert.equal(normalizeCategory({}), "stimulants");
+test("normalizeCategory falls back to other for unknown or missing", () => {
+  assert.equal(
+    normalizeCategory({ category: "Image/performance enhancing" }),
+    "other",
+  );
+  assert.equal(normalizeCategory({}), "other");
 });
 
 test("every filter group has a display label", () => {

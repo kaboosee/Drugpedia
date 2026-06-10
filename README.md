@@ -94,8 +94,11 @@ visitors keep the old cached assets.
 
 ## Repository notes
 
-- [`frank_drugs.json`](frank_drugs.json) is raw source material from Talk to
-  Frank used to derive many of the profiles. It is kept for provenance but is
-  **not** deployed or loaded by the site.
+- [`frank_drugs.json`](frank_drugs.json) is structured source data scraped
+  from Talk to Frank's embedded page JSON. It is kept for provenance but is
+  **not** deployed or loaded by the site. Refresh it with
+  `node scripts/fetch-frank.js`, then merge new data into `data.js` with
+  `node scripts/enrich-data.js` (fill-only: it never overwrites curated
+  fields, only fills missing ones).
 - [`logic.js`](logic.js) holds the pure, testable logic (filtering, category
   normalisation, interaction lookup); [`app.js`](app.js) holds DOM wiring.

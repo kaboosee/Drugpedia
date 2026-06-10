@@ -7,6 +7,7 @@
     dissociatives: "Dissociatives",
     depressants: "Depressants",
     empathogens: "Empathogens",
+    other: "Other",
   };
 
   const RISK_LEVELS = {
@@ -28,19 +29,24 @@
     if (raw.includes("stimulant")) {
       return "stimulants";
     }
-    if (raw.includes("psychedelic")) {
+    if (raw.includes("psychedelic") || raw.includes("hallucinogen")) {
       return "psychedelics";
     }
     if (raw.includes("dissociative")) {
       return "dissociatives";
     }
-    if (raw.includes("depressant") || raw.includes("opioid")) {
+    if (
+      raw.includes("depressant") ||
+      raw.includes("opioid") ||
+      raw.includes("opiate") ||
+      raw.includes("inhalant")
+    ) {
       return "depressants";
     }
-    if (raw.includes("cannabinoid")) {
+    if (raw.includes("cannabi")) {
       return "depressants";
     }
-    return "stimulants";
+    return "other";
   };
 
   const pairKey = (a, b) => {

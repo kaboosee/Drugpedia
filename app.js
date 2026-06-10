@@ -145,9 +145,21 @@ const renderDetail = () => {
 
   detailContent.replaceChildren();
 
+  if (Array.isArray(substance.synonyms) && substance.synonyms.length) {
+    const synonyms = document.createElement("p");
+    synonyms.textContent = substance.synonyms.join(", ");
+    detailContent.appendChild(createSection("Also known as", synonyms));
+  }
+
   const mechanism = document.createElement("p");
   mechanism.textContent = substance.mechanism || "Not available.";
   detailContent.appendChild(createSection("Mechanism of action", mechanism));
+
+  if (Array.isArray(substance.effects) && substance.effects.length) {
+    detailContent.appendChild(
+      createSection("Effects", createList(substance.effects)),
+    );
+  }
 
   const onsetDurationTable = createTable(
     ["Metric", "Value"],
@@ -179,6 +191,12 @@ const renderDetail = () => {
   detailContent.appendChild(
     createSection("Contraindications", createList(substance.contraindications)),
   );
+
+  if (substance.legalStatus) {
+    const legal = document.createElement("p");
+    legal.textContent = substance.legalStatus;
+    detailContent.appendChild(createSection("UK legal status", legal));
+  }
 };
 
 const renderList = () => {

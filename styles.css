@@ -153,9 +153,13 @@ option {
   border-top: 1px solid var(--border);
   overflow: auto;
   flex: 1;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .list-item {
+  width: 100%;
   border: 0;
   border-bottom: 1px solid var(--border);
   padding: 6px 4px;
@@ -185,6 +189,12 @@ option {
 
 .list-item.active {
   background: #1a1a1a;
+}
+
+.list-item mark {
+  background: transparent;
+  color: var(--accent);
+  font-weight: 600;
 }
 
 .list-meta {
@@ -231,6 +241,9 @@ option {
   display: inline-block;
   width: 14px;
   height: 14px;
+  border: 0;
+  padding: 0;
+  font-family: inherit;
   background: var(--border);
   border-radius: 50%;
   text-align: center;
@@ -241,7 +254,13 @@ option {
   position: relative;
 }
 
-.detail-section h3 .info-icon:hover::after {
+.detail-section h3 .info-icon:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.detail-section h3 .info-icon:hover::after,
+.detail-section h3 .info-icon:focus-visible::after {
   content: attr(data-tooltip);
   position: absolute;
   top: 125%;

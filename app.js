@@ -1,21 +1,21 @@
 "use strict";
 
+const {
+  CATEGORY_LABELS,
+  RISK_LEVELS,
+  normalizeCategory,
+  filterSubstances,
+  getInteraction,
+  splitMatch,
+  normalizeDosage,
+} = window.DrugpediaLogic;
+
 const substances = window.substances || [];
 const interactions = window.interactions || {};
-
-const severityOrder = {
-  low: 1,
-  caution: 2,
-  dangerous: 3,
-  "do not combine": 4,
-};
 
 const substanceById = Object.fromEntries(
   substances.map((substance) => [substance.id, substance])
 );
-
-const displayName = (id) =>
-  substanceById[id] ? substanceById[id].name : id.toUpperCase();
 
 const substanceList = document.getElementById("substanceList");
 const detailContent = document.getElementById("detailContent");
@@ -27,42 +27,30 @@ const interactionB = document.getElementById("interactionB");
 const interactionBadge = document.getElementById("interactionBadge");
 const interactionSummary = document.getElementById("interactionSummary");
 
-let activeId = substances.length ? substances[0].id : "";
+const LAST_SUBSTANCE_KEY = "drugpedia:lastSubstance";
 
-const categoryLabels = {
-  stimulants: "Stimulants",
-  psychedelics: "Psychedelics",
-  dissociatives: "Dissociatives",
-  depressants: "Depressants",
-  empathogens: "Empathogens",
+const readStorage = (key) => {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
 };
 
-const normalizeCategory = (substance) => {
-  const raw = (substance.category || "").toLowerCase();
-  if (raw.includes("entactogen") || raw.includes("empathogen")) {
-    return "empathogens";
+const writeStorage = (key, value) => {
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    // Storage unavailable (private mode, blocked) — persistence is optional.
   }
-  if (raw.includes("stimulant")) {
-    return "stimulants";
-  }
-  if (raw.includes("psychedelic")) {
-    return "psychedelics";
-  }
-  if (raw.includes("dissociative")) {
-    return "dissociatives";
-  }
-  if (raw.includes("depressant") || raw.includes("opioid")) {
-    return "depressants";
-  }
-  if (raw.includes("cannabinoid")) {
-    return "depressants";
-  }
-  return "stimulants";
 };
 
-const pairKey = (a, b) => {
-  return [a, b].sort().join("|");
-};
+const storedId = readStorage(LAST_SUBSTANCE_KEY);
+let activeId = substanceById[storedId]
+  ? storedId
+  : substances.length
+    ? substances[0].id
+    : "";
 
 const createList = (items, className) => {
   const list = document.createElement("ul");
@@ -123,9 +111,11 @@ const createSection = (title, content) => {
   };
 
   if (tooltips[title]) {
-    const icon = document.createElement("span");
+    const icon = document.createElement("button");
+    icon.type = "button";
     icon.className = "info-icon";
     icon.textContent = "?";
+    icon.setAttribute("aria-label", tooltips[title]);
     icon.setAttribute("data-tooltip", tooltips[title]);
     heading.appendChild(icon);
   }
@@ -135,39 +125,8 @@ const createSection = (title, content) => {
   return section;
 };
 
-const extractCommonRange = (text) => {
-  if (!text) {
-    return "-";
-  }
-  const match = text.match(/common range:([^.]*)/i);
-  if (match && match[1]) {
-    return match[1].trim();
-  }
-  return text;
-};
-
-const normalizeDosage = (dosage) => {
-  if (dosage && typeof dosage === "object") {
-    return {
-      threshold: dosage.threshold || "-",
-      light: dosage.light || "-",
-      common: dosage.common || "-",
-      strong: dosage.strong || "-",
-    };
-  }
-  if (typeof dosage === "string") {
-    return {
-      threshold: "-",
-      light: "-",
-      common: extractCommonRange(dosage),
-      strong: "-",
-    };
-  }
-  return { threshold: "-", light: "-", common: "-", strong: "-" };
-};
-
 const renderEmptyDetail = (message) => {
-  detailContent.innerHTML = "";
+  detailContent.replaceChildren();
   const empty = document.createElement("p");
   empty.className = "muted";
   empty.textContent = message;
@@ -181,7 +140,7 @@ const renderDetail = () => {
     return;
   }
 
-  detailContent.innerHTML = "";
+  detailContent.replaceChildren();
 
   const mechanism = document.createElement("p");
   mechanism.textContent = substance.mechanism || "Not available.";
@@ -224,33 +183,41 @@ const renderDetail = () => {
 const renderList = () => {
   const query = searchInput.value.trim().toLowerCase();
   const category = categoryFilter.value;
-  const filtered = substances
-    .filter((substance) => {
-      const matchesQuery = substance.name.toLowerCase().includes(query);
-      const group = normalizeCategory(substance);
-      const matchesCategory = category === "all" || group === category;
-      return matchesQuery && matchesCategory;
-    })
-    .sort((left, right) => left.name.localeCompare(right.name));
+  const filtered = filterSubstances(substances, query, category);
 
-  substanceList.innerHTML = "";
+  substanceList.replaceChildren();
   filtered.forEach((substance) => {
+    const listItem = document.createElement("li");
     const item = document.createElement("button");
     item.type = "button";
     item.className =
       "list-item" + (substance.id === activeId ? " active" : "");
-    item.setAttribute("role", "listitem");
-    const group = normalizeCategory(substance);
-    item.innerHTML = `
-      <span>${substance.name}</span>
-      <span class="list-meta">${categoryLabels[group]}</span>
-    `;
+
+    const name = document.createElement("span");
+    splitMatch(substance.name, query).forEach((segment) => {
+      if (segment.match) {
+        const mark = document.createElement("mark");
+        mark.textContent = segment.text;
+        name.appendChild(mark);
+      } else {
+        name.appendChild(document.createTextNode(segment.text));
+      }
+    });
+
+    const meta = document.createElement("span");
+    meta.className = "list-meta";
+    meta.textContent = CATEGORY_LABELS[normalizeCategory(substance)];
+
+    item.appendChild(name);
+    item.appendChild(meta);
     item.addEventListener("click", () => {
       activeId = substance.id;
+      writeStorage(LAST_SUBSTANCE_KEY, activeId);
       renderList();
       renderDetail();
     });
-    substanceList.appendChild(item);
+    listItem.appendChild(item);
+    substanceList.appendChild(listItem);
   });
 
   noResults.hidden = filtered.length !== 0;
@@ -274,7 +241,7 @@ const populateInteractionSelects = () => {
     if (!select) {
       return;
     }
-    select.innerHTML = "";
+    select.replaceChildren();
     const placeholderOption = document.createElement("option");
     placeholderOption.value = "";
     placeholderOption.textContent = placeholder;
@@ -298,44 +265,21 @@ const updateInteractionResult = () => {
   const valueA = interactionA.value;
   const valueB = interactionB.value;
 
-  const setNeutral = (message) => {
+  const result = getInteraction(interactions, valueA, valueB);
+  if (!result) {
     interactionBadge.textContent = "Select two substances";
     interactionBadge.className = "risk-badge risk-neutral";
-    interactionSummary.textContent = message;
-  };
-
-  if (!valueA || !valueB) {
-    setNeutral("Choose two substances to see interaction risk.");
-    return;
-  }
-  if (valueA === valueB) {
-    setNeutral("Select two different substances.");
+    interactionSummary.textContent =
+      valueA && valueA === valueB
+        ? "Select two different substances."
+        : "Choose two substances to see interaction risk.";
     return;
   }
 
-  const match = interactions[pairKey(valueA, valueB)];
-  const risk = match ? match.risk : "caution";
-  const summary = match
-    ? match.summary
-    : "Limited data; mixing increases unpredictability.";
-
-  const labels = {
-    low: "SAFE",
-    caution: "CAUTION",
-    dangerous: "DANGEROUS",
-    "do not combine": "DO NOT COMBINE",
-  };
-
-  const classes = {
-    low: "risk-safe",
-    caution: "risk-caution",
-    dangerous: "risk-dangerous",
-    "do not combine": "risk-do-not-combine",
-  };
-
-  interactionBadge.textContent = labels[risk] || "CAUTION";
-  interactionBadge.className = `risk-badge ${classes[risk] || "risk-caution"}`;
-  interactionSummary.textContent = summary;
+  const level = RISK_LEVELS[result.risk] || RISK_LEVELS.caution;
+  interactionBadge.textContent = level.label;
+  interactionBadge.className = `risk-badge ${level.className}`;
+  interactionSummary.textContent = result.summary;
 };
 
 searchInput.addEventListener("input", renderList);
@@ -347,27 +291,47 @@ if (interactionB) {
   interactionB.addEventListener("change", updateInteractionResult);
 }
 
-// Mobile tab switching
+// Mobile tab switching (ARIA tabs pattern; tablist is hidden on desktop)
 const mobileTabs = document.getElementById("mobileTabs");
 if (mobileTabs) {
-  const tabButtons = mobileTabs.querySelectorAll(".mobile-tab-btn");
+  const tabButtons = [...mobileTabs.querySelectorAll(".mobile-tab-btn")];
   const panels = document.querySelectorAll(".panel");
 
-  tabButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const tabName = btn.getAttribute("data-tab");
+  const activateTab = (btn) => {
+    tabButtons.forEach((b) => {
+      const selected = b === btn;
+      b.classList.toggle("active", selected);
+      b.setAttribute("aria-selected", String(selected));
+      b.tabIndex = selected ? 0 : -1;
+    });
 
-      tabButtons.forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
+    panels.forEach((panel) => panel.classList.remove("active"));
+    const panel = document.getElementById(
+      btn.getAttribute("aria-controls")
+    );
+    if (panel) {
+      panel.classList.add("active");
+    }
+  };
 
-      panels.forEach((panel) => panel.classList.remove("active"));
-
-      if (tabName === "substances") {
-        document.querySelector(".panel.sidebar").classList.add("active");
-      } else if (tabName === "detail") {
-        document.querySelector(".panel.detail").classList.add("active");
-      } else if (tabName === "interaction") {
-        document.querySelector(".panel.interaction").classList.add("active");
+  tabButtons.forEach((btn, index) => {
+    btn.addEventListener("click", () => activateTab(btn));
+    btn.addEventListener("keydown", (event) => {
+      let target = null;
+      if (event.key === "ArrowRight") {
+        target = tabButtons[(index + 1) % tabButtons.length];
+      } else if (event.key === "ArrowLeft") {
+        target =
+          tabButtons[(index - 1 + tabButtons.length) % tabButtons.length];
+      } else if (event.key === "Home") {
+        target = tabButtons[0];
+      } else if (event.key === "End") {
+        target = tabButtons[tabButtons.length - 1];
+      }
+      if (target) {
+        event.preventDefault();
+        activateTab(target);
+        target.focus();
       }
     });
   });

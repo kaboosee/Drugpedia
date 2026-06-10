@@ -4,6 +4,29 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Drugpedia</title>
+    <meta
+      name="description"
+      content="Harm reduction reference: searchable drug profiles, dosage ranges, and an interaction checker. Compiled from TripSit, PsychonautWiki, Talk to Frank, and Erowid."
+    />
+    <link rel="canonical" href="https://kaboosee.github.io/Drugpedia/" />
+    <meta property="og:title" content="Drugpedia" />
+    <meta
+      property="og:description"
+      content="Harm reduction reference: searchable drug profiles, dosage ranges, and an interaction checker."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://kaboosee.github.io/Drugpedia/" />
+    <meta name="twitter:card" content="summary" />
+    <meta
+      name="theme-color"
+      media="(prefers-color-scheme: dark)"
+      content="#0a0a0a"
+    />
+    <meta
+      name="theme-color"
+      media="(prefers-color-scheme: light)"
+      content="#f5f5f5"
+    />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -23,14 +46,42 @@
       </p>
     </header>
 
-    <div class="mobile-tabs" id="mobileTabs">
-      <button class="mobile-tab-btn active" data-tab="substances">Substances</button>
-      <button class="mobile-tab-btn" data-tab="detail">Details</button>
-      <button class="mobile-tab-btn" data-tab="interaction">Interactions</button>
+    <div class="mobile-tabs" id="mobileTabs" role="tablist" aria-label="Sections">
+      <button
+        class="mobile-tab-btn active"
+        role="tab"
+        aria-selected="true"
+        aria-controls="panel-substances"
+      >
+        Substances
+      </button>
+      <button
+        class="mobile-tab-btn"
+        role="tab"
+        aria-selected="false"
+        aria-controls="panel-detail"
+        tabindex="-1"
+      >
+        Details
+      </button>
+      <button
+        class="mobile-tab-btn"
+        role="tab"
+        aria-selected="false"
+        aria-controls="panel-interaction"
+        tabindex="-1"
+      >
+        Interactions
+      </button>
     </div>
 
     <main>
-      <section class="panel sidebar active" aria-labelledby="index-title">
+      <section
+        id="panel-substances"
+        class="panel sidebar active"
+        role="tabpanel"
+        aria-labelledby="index-title"
+      >
         <h2 id="index-title">Substance index</h2>
         <div class="controls">
           <div class="field">
@@ -53,16 +104,26 @@
             </select>
           </div>
         </div>
-        <div id="substanceList" class="list" role="list"></div>
+        <ul id="substanceList" class="list"></ul>
         <p id="noResults" class="muted" hidden>No substances found.</p>
       </section>
 
-      <section class="panel detail" aria-labelledby="detail-title">
+      <section
+        id="panel-detail"
+        class="panel detail"
+        role="tabpanel"
+        aria-labelledby="detail-title"
+      >
         <h2 id="detail-title">Substance detail</h2>
         <div id="detailContent" class="detail-content"></div>
       </section>
 
-      <section class="panel interaction" aria-labelledby="interaction-title">
+      <section
+        id="panel-interaction"
+        class="panel interaction"
+        role="tabpanel"
+        aria-labelledby="interaction-title"
+      >
         <h2 id="interaction-title">Interaction checker</h2>
         <div class="interaction-fields">
           <div class="field">
@@ -90,6 +151,7 @@
     </main>
 
     <script src="data.js"></script>
+    <script src="logic.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

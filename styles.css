@@ -812,10 +812,28 @@ option {
 @media (max-width: 640px) {
   /* Scroll the document (not a nested panel) so iOS Safari collapses its
      toolbars and the full screen is used. The header scrolls away naturally;
-     the tabs stay pinned at the top. */
+     the tabs stay pinned at the top. Content-height layout (not viewport-tied)
+     keeps the scroll continuous when the toolbar collapses. */
+  html,
+  body {
+    height: auto;
+  }
+
+  body {
+    display: block;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
   main {
     display: block;
     padding: 0;
+  }
+
+  /* Stop iOS zooming the page when a form control under 16px is focused. */
+  input[type="search"],
+  select {
+    font-size: 16px;
   }
 
   .mobile-tabs {
@@ -853,7 +871,9 @@ option {
 
   .panel {
     display: none;
-    padding: 10px;
+    /* Extra bottom space so the last items aren't hidden behind Safari's
+       bottom toolbar / home indicator. */
+    padding: 10px 10px calc(80px + env(safe-area-inset-bottom, 0px));
     overflow: visible;
   }
 

@@ -2,7 +2,7 @@
 
 // Bump this version whenever any cached asset changes, or returning
 // visitors will keep the old files (see README "Releasing changes").
-const CACHE = "drugpedia-v15";
+const CACHE = "drugpedia-v16";
 
 const ASSETS = [
   "./",

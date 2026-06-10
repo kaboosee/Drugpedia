@@ -12,6 +12,7 @@ const {
 
 const substanceList = document.getElementById("substanceList");
 const detailContent = document.getElementById("detailContent");
+const detailTitle = document.getElementById("detail-title");
 const searchInput = document.getElementById("search");
 const categoryFilter = document.getElementById("categoryFilter");
 const noResults = document.getElementById("noResults");
@@ -295,8 +296,17 @@ const initApp = (data) => {
   const renderDetail = () => {
     const substance = substanceById[activeId];
     if (!substance) {
+      if (detailTitle) {
+        detailTitle.textContent = "Substance detail";
+      }
       renderEmptyDetail("Select a substance to view details.");
       return;
+    }
+
+    // Title the panel with the current substance so it's always clear which
+    // one you're viewing (and which not to re-pick when switching).
+    if (detailTitle) {
+      detailTitle.textContent = substance.name;
     }
 
     detailContent.replaceChildren();
@@ -393,6 +403,15 @@ const initApp = (data) => {
         writeStorage(LAST_SUBSTANCE_KEY, activeId);
         renderList();
         renderDetail();
+        // On mobile, jump to the Details tab so the profile is shown. The tab
+        // button is hidden on desktop (offsetParent null), so this is a no-op
+        // there. Clicking it runs activateTab (switch panel + scroll to top).
+        const detailTab = document.querySelector(
+          '.mobile-tab-btn[aria-controls="panel-detail"]',
+        );
+        if (detailTab && detailTab.offsetParent !== null) {
+          detailTab.click();
+        }
       });
       listItem.appendChild(item);
       substanceList.appendChild(listItem);

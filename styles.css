@@ -190,6 +190,14 @@ main {
   color: var(--muted);
 }
 
+/* The detail panel title holds the current substance name — make it read as a
+   title rather than a faint label. */
+#detail-title {
+  color: var(--text);
+  font-size: 0.95rem;
+  letter-spacing: 0.1em;
+}
+
 .controls {
   display: grid;
   gap: 8px;
@@ -831,7 +839,7 @@ option {
   }
 
   /* Stop iOS zooming the page when a form control under 16px is focused. */
-  input[type="search"],
+  input,
   select {
     font-size: 16px;
   }

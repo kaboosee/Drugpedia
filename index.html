@@ -27,11 +27,29 @@
       media="(prefers-color-scheme: light)"
       content="#f5f5f5"
     />
+    <script>
+      // Set the theme before the stylesheet paints to avoid a flash.
+      (function () {
+        var theme;
+        try {
+          theme = localStorage.getItem("drugpedia:theme");
+        } catch (e) {
+          theme = null;
+        }
+        if (theme !== "light" && theme !== "dark") {
+          theme = window.matchMedia("(prefers-color-scheme: light)").matches
+            ? "light"
+            : "dark";
+        }
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <header>
       <h1>Drugpedia</h1>
+      <button type="button" id="themeToggle" class="theme-toggle">Theme</button>
       <p>
         Reference material compiled from TripSit, PsychonautWiki, Talk to Frank,
         and Erowid. This is harm reduction guidance, not medical advice.
@@ -90,7 +108,11 @@
         <div class="controls">
           <div class="field">
             <label for="search">Search</label>
-            <input id="search" type="search" placeholder="Search substances" />
+            <input
+              id="search"
+              type="search"
+              placeholder="Search substances (/)"
+            />
           </div>
           <div class="field">
             <label for="categoryFilter">Category</label>

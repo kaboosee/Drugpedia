@@ -282,6 +282,31 @@ const updateInteractionResult = () => {
   interactionSummary.textContent = result.summary;
 };
 
+// Theme toggle (initial theme is set by the inline script in index.html)
+const THEME_KEY = "drugpedia:theme";
+const themeToggle = document.getElementById("themeToggle");
+if (themeToggle) {
+  themeToggle.addEventListener("click", () => {
+    const next =
+      document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    writeStorage(THEME_KEY, next);
+  });
+}
+
+// Keyboard shortcuts: Ctrl/Cmd+K or "/" focuses search
+document.addEventListener("keydown", (event) => {
+  const inFormField = /^(input|select|textarea)$/i.test(event.target.tagName);
+  if (
+    ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") ||
+    (event.key === "/" && !inFormField)
+  ) {
+    event.preventDefault();
+    searchInput.focus();
+    searchInput.select();
+  }
+});
+
 searchInput.addEventListener("input", renderList);
 categoryFilter.addEventListener("change", renderList);
 if (interactionA) {

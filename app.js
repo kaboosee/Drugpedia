@@ -364,3 +364,8 @@ renderList();
 renderDetail();
 populateInteractionSelects();
 updateInteractionResult();
+
+// Offline support; requires http(s), so skip silently on file://
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}

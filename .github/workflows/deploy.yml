@@ -43,7 +43,8 @@ jobs:
       - name: Assemble site
         run: |
           mkdir _site
-          cp index.html app.js data.js styles.css _site/
+          cp index.html app.js logic.js data.js styles.css manifest.webmanifest sw.js _site/
+          cp -r icons _site/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

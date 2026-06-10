@@ -53,6 +53,32 @@
     return [a, b].sort().join("|");
   };
 
+  // The most commonly used substances, surfaced at the top of the list in
+  // this order. Anything not listed here follows alphabetically.
+  const COMMON_SUBSTANCE_IDS = [
+    "alcohol",
+    "cannabis",
+    "nicotine",
+    "cocaine",
+    "mdma",
+    "ketamine",
+    "amphetamine",
+    "lsd",
+    "psilocybin",
+    "benzodiazepines",
+    "2cb",
+    "ghb",
+    "nitrous",
+    "heroin",
+    "methamphetamine",
+    "opioids",
+  ];
+
+  const commonRank = (substance) => {
+    const index = COMMON_SUBSTANCE_IDS.indexOf(substance.id);
+    return index === -1 ? Number.POSITIVE_INFINITY : index;
+  };
+
   const filterSubstances = (substances, query, category) => {
     const normalizedQuery = (query || "").trim().toLowerCase();
     return substances
@@ -64,7 +90,14 @@
         const matchesCategory = category === "all" || group === category;
         return matchesQuery && matchesCategory;
       })
-      .sort((left, right) => left.name.localeCompare(right.name));
+      .sort((left, right) => {
+        const rankLeft = commonRank(left);
+        const rankRight = commonRank(right);
+        if (rankLeft !== rankRight) {
+          return rankLeft - rankRight;
+        }
+        return left.name.localeCompare(right.name);
+      });
   };
 
   const getInteraction = (interactions, a, b) => {
@@ -144,6 +177,7 @@
   const api = {
     CATEGORY_LABELS,
     RISK_LEVELS,
+    COMMON_SUBSTANCE_IDS,
     normalizeCategory,
     pairKey,
     filterSubstances,

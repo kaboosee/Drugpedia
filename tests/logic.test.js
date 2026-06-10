@@ -93,11 +93,38 @@ test("filterSubstances filters by category group", () => {
   );
 });
 
-test("filterSubstances sorts alphabetically by name", () => {
+test("filterSubstances surfaces common substances first, then alphabetical", () => {
   const result = filterSubstances(sample, "", "all");
+  // alcohol, mdma, ketamine, lsd are all "common" — ordered by their rank in
+  // COMMON_SUBSTANCE_IDS, not alphabetically.
   assert.deepEqual(
     result.map((s) => s.name),
-    ["Alcohol", "Ketamine", "LSD", "MDMA"],
+    ["Alcohol", "MDMA", "Ketamine", "LSD"],
+  );
+});
+
+test("filterSubstances sorts non-common substances alphabetically", () => {
+  const others = [
+    { id: "tramadol", name: "Tramadol", category: "Opioid" },
+    { id: "khat", name: "Khat", category: "Stimulant" },
+    { id: "salvia", name: "Salvia", category: "Dissociative" },
+  ];
+  const result = filterSubstances(others, "", "all");
+  assert.deepEqual(
+    result.map((s) => s.name),
+    ["Khat", "Salvia", "Tramadol"],
+  );
+});
+
+test("filterSubstances ranks a common substance above a non-common one", () => {
+  const mixed = [
+    { id: "khat", name: "Khat", category: "Stimulant" },
+    { id: "cocaine", name: "Cocaine", category: "Stimulant" },
+  ];
+  const result = filterSubstances(mixed, "", "all");
+  assert.deepEqual(
+    result.map((s) => s.id),
+    ["cocaine", "khat"],
   );
 });
 

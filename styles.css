@@ -476,18 +476,107 @@ option {
     overflow: hidden;
   }
 
+  /* Compact the header so the pinned panels get more vertical room and
+     more of the substance detail is visible before it scrolls. */
+  header {
+    padding: 8px 16px 6px;
+  }
+
+  header h1 {
+    font-size: 1.15rem;
+    margin: 0 0 4px;
+  }
+
+  header p {
+    font-size: 0.7rem;
+    margin: 0 0 3px;
+    line-height: 1.3;
+  }
+
+  /* Two columns: a narrow substance list on the left, and the detail filling
+     the rest. The interaction checker drops to a compact bar under the
+     detail so the detail gets nearly the full width and height. */
   main {
     min-height: 0;
     align-items: stretch;
+    grid-template-columns: 240px minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "list detail"
+      "list interaction";
+  }
+
+  .sidebar {
+    grid-area: list;
+  }
+
+  .detail {
+    grid-area: detail;
+  }
+
+  .interaction {
+    grid-area: interaction;
   }
 
   .panel {
     overflow: hidden;
   }
 
+  /* Flow the detail sections into as many columns as the width allows so the
+     whole profile fits without scrolling. Falls back to vertical scroll only
+     if an unusually long profile still overflows. */
   .detail-content {
     flex: 1;
     min-height: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    align-content: start;
+    gap: 6px 18px;
+  }
+
+  .detail-section {
+    break-inside: avoid;
+  }
+
+  /* Interaction checker as a horizontal bar: fields and result side by side. */
+  .interaction {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .interaction h2 {
+    margin: 0;
+    white-space: nowrap;
+    align-self: center;
+  }
+
+  .interaction-fields {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    margin-bottom: 0;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .interaction-fields .field {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .interaction-result {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .interaction-result .muted {
+    margin: 0;
   }
 }
 

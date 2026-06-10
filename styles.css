@@ -52,6 +52,31 @@
   box-sizing: border-box;
 }
 
+/* Thin, themed scrollbars so the in-panel overflow regions don't show
+   chunky default OS bars (Firefox + WebKit/Blink). */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
 html,
 body {
   height: 100%;
@@ -279,6 +304,9 @@ option {
   border-top: 1px solid var(--border);
   padding-top: 8px;
   position: relative;
+  min-width: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .detail-section:first-child {
@@ -382,6 +410,8 @@ option {
   border: 1px solid var(--border);
   padding: 6px 8px;
   text-align: left;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .data-table th {

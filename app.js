@@ -14,7 +14,7 @@ const substances = window.substances || [];
 const interactions = window.interactions || {};
 
 const substanceById = Object.fromEntries(
-  substances.map((substance) => [substance.id, substance])
+  substances.map((substance) => [substance.id, substance]),
 );
 
 const substanceList = document.getElementById("substanceList");
@@ -102,12 +102,15 @@ const createSection = (title, content) => {
   heading.textContent = title;
 
   const tooltips = {
-    "Mechanism of action": "How the drug works in your body at a molecular level",
+    "Mechanism of action":
+      "How the drug works in your body at a molecular level",
     "Onset and duration": "When effects start and how long they last",
-    "Dosage ranges": "Amount guidelines: Threshold (barely noticeable) → Strong (intense)",
+    "Dosage ranges":
+      "Amount guidelines: Threshold (barely noticeable) → Strong (intense)",
     "Acute risks": "Immediate dangers and short-term health effects",
     "Harm reduction checklist": "Safer practices to reduce risk of harm",
-    "Contraindications": "Medical conditions or drugs that make this unsafe to use"
+    Contraindications:
+      "Medical conditions or drugs that make this unsafe to use",
   };
 
   if (tooltips[title]) {
@@ -144,39 +147,37 @@ const renderDetail = () => {
 
   const mechanism = document.createElement("p");
   mechanism.textContent = substance.mechanism || "Not available.";
-  detailContent.appendChild(
-    createSection("Mechanism of action", mechanism)
-  );
+  detailContent.appendChild(createSection("Mechanism of action", mechanism));
 
   const onsetDurationTable = createTable(
     ["Metric", "Value"],
     [
       ["Onset", substance.onset || "-"],
       ["Duration", substance.duration || "-"],
-    ]
+    ],
   );
   detailContent.appendChild(
-    createSection("Onset and duration", onsetDurationTable)
+    createSection("Onset and duration", onsetDurationTable),
   );
 
   const dosage = normalizeDosage(substance.dosage);
   const dosageTable = createTable(
     ["Threshold", "Light", "Common", "Strong"],
-    [[dosage.threshold, dosage.light, dosage.common, dosage.strong]]
+    [[dosage.threshold, dosage.light, dosage.common, dosage.strong]],
   );
   detailContent.appendChild(createSection("Dosage ranges", dosageTable));
 
   detailContent.appendChild(
-    createSection("Acute risks", createList(substance.acuteRisks))
+    createSection("Acute risks", createList(substance.acuteRisks)),
   );
   detailContent.appendChild(
     createSection(
       "Harm reduction checklist",
-      createList(substance.harmReduction, "checklist")
-    )
+      createList(substance.harmReduction, "checklist"),
+    ),
   );
   detailContent.appendChild(
-    createSection("Contraindications", createList(substance.contraindications))
+    createSection("Contraindications", createList(substance.contraindications)),
   );
 };
 
@@ -190,8 +191,7 @@ const renderList = () => {
     const listItem = document.createElement("li");
     const item = document.createElement("button");
     item.type = "button";
-    item.className =
-      "list-item" + (substance.id === activeId ? " active" : "");
+    item.className = "list-item" + (substance.id === activeId ? " active" : "");
 
     const name = document.createElement("span");
     splitMatch(substance.name, query).forEach((segment) => {
@@ -235,7 +235,7 @@ const renderList = () => {
 
 const populateInteractionSelects = () => {
   const sorted = [...substances].sort((left, right) =>
-    left.name.localeCompare(right.name)
+    left.name.localeCompare(right.name),
   );
   const buildSelect = (select, placeholder) => {
     if (!select) {
@@ -306,9 +306,7 @@ if (mobileTabs) {
     });
 
     panels.forEach((panel) => panel.classList.remove("active"));
-    const panel = document.getElementById(
-      btn.getAttribute("aria-controls")
-    );
+    const panel = document.getElementById(btn.getAttribute("aria-controls"));
     if (panel) {
       panel.classList.add("active");
     }

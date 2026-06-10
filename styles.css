@@ -908,26 +908,26 @@ option {
     padding-left: 0;
   }
 
-  /* Interaction rows: badge + name centered on one line, note centered below. */
-  .interaction-list li {
-    display: block;
+  /* Effects and interactions look cramped centered — keep them left-aligned
+     with normal hanging bullets / row layout. */
+  .detail-section ul.effects-list {
+    text-align: left;
+    list-style-position: outside;
+    padding-left: 18px;
   }
 
-  .interaction-list .interaction-name {
-    display: inline;
-    margin-left: 6px;
+  .interaction-list {
+    text-align: left;
   }
 
-  .interaction-note {
-    display: block;
-  }
-
+  /* Tables shrink to their content and centre, scrolling only if too wide. */
   .data-table {
     font-size: 0.75rem;
     display: block;
+    width: fit-content;
+    max-width: 100%;
+    margin-inline: auto;
     overflow-x: auto;
-    margin-left: auto;
-    margin-right: auto;
   }
 
   .data-table th,

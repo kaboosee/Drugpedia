@@ -2,6 +2,13 @@
 
 :root {
   color-scheme: dark;
+  /* Sans-serif for readable body copy; monospace kept for headers, labels and
+     data fields (dosage / onset-duration tables) — the site's mono aesthetic. */
+  --font-sans:
+    system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono:
+    "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
   --bg: #0a0a0a;
   --panel: #0f0f0f;
   --border: #2a2a2a;
@@ -72,15 +79,26 @@ body {
 
 body {
   margin: 0;
-  font-family:
-    "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-    "Liberation Mono", "Courier New", monospace;
+  font-family: var(--font-sans);
   background: var(--bg);
   color: var(--text);
-  font-size: 13px;
-  line-height: 1.45;
+  font-size: 14.5px;
+  line-height: 1.55;
   display: flex;
   flex-direction: column;
+}
+
+/* Headers, labels and data fields keep the monospace look. */
+header h1,
+.theme-toggle,
+.panel h2,
+.field label,
+.detail-section h3,
+.list-meta,
+.mobile-tab-btn,
+.risk-badge,
+.data-table {
+  font-family: var(--font-mono);
 }
 
 header {
@@ -281,7 +299,7 @@ option {
 
 .detail-content {
   display: grid;
-  gap: 10px;
+  gap: 16px;
   overflow: auto;
   padding-right: 4px;
   overflow-y: auto;
@@ -290,7 +308,7 @@ option {
 
 .detail-section {
   border-top: 1px solid var(--border);
-  padding-top: 8px;
+  padding-top: 14px;
   position: relative;
   min-width: 0;
   overflow-wrap: break-word;
@@ -302,12 +320,48 @@ option {
   padding-top: 0;
 }
 
-.detail-section h3 {
-  margin: 0 0 6px;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
+/* Prioritise danger: acute risks / overdose get a red accent, harm reduction
+   an amber one — a left border plus a faint tint. */
+.detail-section.danger,
+.detail-section.harm {
+  border-top: 0;
+  padding: 12px 12px 12px 14px;
+  border-radius: 2px;
+}
+
+.detail-section.danger {
+  border-left: 3px solid var(--dangerous);
+  background: color-mix(in srgb, var(--dangerous) 9%, transparent);
+}
+
+.detail-section.harm {
+  border-left: 3px solid var(--caution);
+  background: color-mix(in srgb, var(--caution) 9%, transparent);
+}
+
+.detail-section.danger h3 {
+  color: var(--dangerous);
+}
+
+.dash {
   color: var(--muted);
+}
+
+/* Also known as + Drug class sit side by side. On desktop the parent grid
+   already columns the sections, so the wrapper steps out of the way. */
+.detail-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 18px;
+}
+
+.detail-section h3 {
+  margin: 0 0 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -372,21 +426,6 @@ option {
   margin-bottom: 4px;
 }
 
-.checklist {
-  list-style: none;
-  padding-left: 0;
-}
-
-.checklist li {
-  display: flex;
-  gap: 6px;
-}
-
-.checklist li::before {
-  content: "[ ]";
-  color: var(--muted);
-}
-
 .data-table {
   width: 100%;
   border-collapse: collapse;
@@ -397,7 +436,8 @@ option {
 .data-table td {
   border: 1px solid var(--border);
   padding: 6px 8px;
-  text-align: left;
+  text-align: center;
+  vertical-align: middle;
   overflow-wrap: break-word;
   word-break: break-word;
 }
@@ -409,14 +449,119 @@ option {
   color: var(--muted);
 }
 
+.data-table caption {
+  caption-side: top;
+  text-align: center;
+  padding-bottom: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+/* Per-drug interaction list: severity badge + name, optional note below. */
+.interaction-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.interaction-list li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: baseline;
+  gap: 4px 8px;
+}
+
+.interaction-list .risk-badge {
+  justify-self: start;
+}
+
+.interaction-name {
+  font-weight: 600;
+}
+
+.interaction-note {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+/* In-detail substance switcher — only shown on mobile (see media query). */
+.detail-search {
+  display: none;
+}
+
+.detail-search-toggle {
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  background: var(--input-bg);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+}
+
+.detail-search-toggle:hover {
+  border-color: var(--accent);
+}
+
+.detail-search-panel {
+  margin-top: 6px;
+}
+
+.detail-search-panel input {
+  width: 100%;
+}
+
+.detail-search-results {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  max-height: 240px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+}
+
+.detail-search-results:empty {
+  display: none;
+}
+
+.detail-search-result {
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.detail-search-result:hover {
+  background: var(--hover-bg);
+}
+
 .interaction-fields {
   display: grid;
   gap: 10px;
-  margin-bottom: 12px;
+  margin-bottom: 0;
 }
 
+/* Result reads as one unit with the selectors above it: no gap, shared edge. */
 .interaction-result {
   border: 1px solid var(--border);
+  border-top: 3px solid var(--accent);
+  margin-top: 10px;
   padding: 10px;
   display: grid;
   gap: 8px;
@@ -461,6 +606,46 @@ option {
   background: transparent;
   color: var(--muted);
   border-color: var(--border);
+}
+
+/* UK legal class badge — colour-tiered like the risk badges (A reddest). */
+.legal-badge {
+  display: inline-block;
+  margin-bottom: 8px;
+  padding: 3px 9px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  color: #fff;
+}
+
+.legal-A {
+  background: var(--dangerous);
+  border-color: var(--dangerous);
+}
+
+.legal-B {
+  background: #c2701c;
+  border-color: #c2701c;
+}
+
+.legal-C {
+  background: #9c7f1f;
+  border-color: #9c7f1f;
+}
+
+.legal-PSA {
+  background: #5d6b7c;
+  border-color: #5d6b7c;
+}
+
+.legal-Legal {
+  background: var(--safe);
+  border-color: var(--safe);
 }
 
 .muted {
@@ -529,13 +714,26 @@ option {
     flex: 1;
     min-height: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
     align-content: start;
-    gap: 6px 18px;
+    gap: 16px 26px;
   }
 
   .detail-section {
     break-inside: avoid;
+  }
+
+  /* The wrapper steps aside so its two sections join the auto-fill columns
+     individually instead of being squeezed into one. */
+  .detail-pair {
+    display: contents;
+  }
+
+  /* Cap the (often long) interactions list so it scrolls internally rather
+     than forcing the whole detail panel to scroll far. */
+  .interaction-list {
+    max-height: 230px;
+    overflow-y: auto;
   }
 
   /* Interaction checker as a horizontal bar: fields and result side by side. */
@@ -573,6 +771,9 @@ option {
     gap: 12px;
     flex: 1;
     min-width: 0;
+    margin-top: 0;
+    border-top: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
   }
 
   .interaction-result .muted {
@@ -637,8 +838,26 @@ option {
     display: flex;
   }
 
+  /* Let users jump to another substance without leaving the Details tab. */
+  .detail-search {
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  /* Two columns of bullets so the effects list takes less vertical space. */
+  .effects-list {
+    column-count: 2;
+    column-gap: 16px;
+  }
+
+  .effects-list li {
+    break-inside: avoid;
+  }
+
+  /* Reserve space on the right so the header text never runs under the
+     absolutely-positioned theme toggle. */
   header {
-    padding: 10px 12px 8px;
+    padding: 10px 60px 8px 12px;
   }
 
   header h1 {
@@ -651,27 +870,69 @@ option {
     margin: 0 0 4px;
   }
 
+  /* Scrolling a panel shrinks the header to free up room (see body.scrolled
+     toggle in app.js). */
+  body.scrolled header {
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+
+  body.scrolled header h1 {
+    font-size: 0.75rem;
+    margin: 0;
+  }
+
+  body.scrolled header p,
+  body.scrolled .theme-toggle {
+    display: none;
+  }
+
   .list {
     max-height: calc(100vh - 200px);
   }
 
+  /* Center the whole profile on narrow screens. */
   .detail-content {
     max-height: calc(100vh - 200px);
+    text-align: center;
+  }
+
+  .detail-section h3 {
+    font-size: 0.65rem;
+    justify-content: center;
+  }
+
+  /* Bullets centered with their text rather than hanging off the left edge. */
+  .detail-section ul {
+    list-style-position: inside;
+    padding-left: 0;
+  }
+
+  /* Interaction rows: badge + name centered on one line, note centered below. */
+  .interaction-list li {
+    display: block;
+  }
+
+  .interaction-list .interaction-name {
+    display: inline;
+    margin-left: 6px;
+  }
+
+  .interaction-note {
+    display: block;
   }
 
   .data-table {
     font-size: 0.75rem;
     display: block;
     overflow-x: auto;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .data-table th,
   .data-table td {
     padding: 4px 6px;
-  }
-
-  .detail-section h3 {
-    font-size: 0.65rem;
   }
 
   .panel h2 {

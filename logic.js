@@ -22,7 +22,11 @@
   };
 
   const normalizeCategory = (substance) => {
-    const raw = (substance.category || "").toLowerCase();
+    const raw = (
+      substance.drug_class ||
+      substance.category ||
+      ""
+    ).toLowerCase();
     if (raw.includes("entactogen") || raw.includes("empathogen")) {
       return "empathogens";
     }
@@ -154,24 +158,38 @@
     return text;
   };
 
+  // Accepts the dosage_ranges object { route?, threshold, light, common,
+  // strong, heavy } (any field may be null), a legacy string, or nothing.
   const normalizeDosage = (dosage) => {
+    const dash = (v) => v || "-";
     if (dosage && typeof dosage === "object") {
       return {
-        threshold: dosage.threshold || "-",
-        light: dosage.light || "-",
-        common: dosage.common || "-",
-        strong: dosage.strong || "-",
+        route: dosage.route || null,
+        threshold: dash(dosage.threshold),
+        light: dash(dosage.light),
+        common: dash(dosage.common),
+        strong: dash(dosage.strong),
+        heavy: dash(dosage.heavy),
       };
     }
     if (typeof dosage === "string") {
       return {
+        route: null,
         threshold: "-",
         light: "-",
         common: extractCommonRange(dosage),
         strong: "-",
+        heavy: "-",
       };
     }
-    return { threshold: "-", light: "-", common: "-", strong: "-" };
+    return {
+      route: null,
+      threshold: "-",
+      light: "-",
+      common: "-",
+      strong: "-",
+      heavy: "-",
+    };
   };
 
   const api = {

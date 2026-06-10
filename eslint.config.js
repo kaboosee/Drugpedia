@@ -9,7 +9,7 @@ module.exports = [
   js.configs.recommended,
   prettier,
   {
-    files: ["app.js", "logic.js", "data.js", "sw.js"],
+    files: ["app.js", "logic.js", "sw.js"],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: "script",

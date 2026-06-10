@@ -53,15 +53,11 @@
     <header>
       <h1>Drugpedia</h1>
       <button type="button" id="themeToggle" class="theme-toggle">Theme</button>
-      <p>
-        Reference material compiled from TripSit, PsychonautWiki, Talk to Frank,
-        and Erowid. This is harm reduction guidance, not medical advice.
-      </p>
       <p class="muted">
         Use for personal education only. If in doubt or unwell, seek medical
         help:
         <span class="emergency-numbers">
-          UK: 111 / 999 • US: 911 • EU: 112 • AU: 000 • NZ: 111
+          UK: 999 • US: 911 • EU: 112 • AU: 000 • NZ: 111
         </span>
       </p>
     </header>
@@ -141,6 +137,26 @@
         aria-labelledby="detail-title"
       >
         <h2 id="detail-title">Substance detail</h2>
+        <div class="detail-search" id="detailSearch">
+          <button
+            type="button"
+            class="detail-search-toggle"
+            id="detailSearchToggle"
+            aria-expanded="false"
+            aria-controls="detailSearchPanel"
+          >
+            Switch substance…
+          </button>
+          <div class="detail-search-panel" id="detailSearchPanel" hidden>
+            <input
+              id="detailSearchInput"
+              type="search"
+              placeholder="Search substances"
+              autocomplete="off"
+            />
+            <ul class="detail-search-results" id="detailSearchResults"></ul>
+          </div>
+        </div>
         <div id="detailContent" class="detail-content"></div>
       </section>
 
@@ -176,7 +192,6 @@
       </section>
     </main>
 
-    <script src="data.js"></script>
     <script src="logic.js"></script>
     <script src="app.js"></script>
   </body>

@@ -15,16 +15,19 @@ interaction checker. Compiled from [TripSit](https://tripsit.me/),
 ## Features
 
 - Substance index with search (`/` or `Ctrl+K` to focus) and category filter
-- Detail view: mechanism, onset/duration, dosage ranges, acute risks, harm
-  reduction checklist, contraindications
+- Detail view: also-known-as, drug class, mechanism, effects, onset/duration,
+  dosage ranges, acute risks, overdose signs, addiction potential, harm
+  reduction checklist, contraindications, UK legal status, drug interactions,
+  and source links
 - Interaction checker with colour-coded risk levels for substance pairs
 - Dark/light theme toggle (follows your OS preference by default)
 - Works offline once visited (installable as a PWA)
 
 ## Running locally
 
-There is no build step — it's plain HTML/CSS/JS. Either open `index.html`
-directly in a browser, or serve the folder (required for the service worker):
+There is no build step for the site — it's plain HTML/CSS/JS. The page fetches
+its data from `data/drugs.json`, so it must be **served over http(s)** (opening
+`index.html` from `file://` won't load the data):
 
 ```sh
 npx serve .
@@ -32,44 +35,37 @@ npx serve .
 python -m http.server
 ```
 
-## Adding a substance
+## Data
 
-All curated data lives in [`data.js`](data.js). Add an object to
-`window.substances`:
+The site reads a single compiled file, [`data/drugs.json`](data/drugs.json),
+built from two sources and committed to the repo:
 
-```js
-{
-  "id": "mdma",                  // unique, lowercase, used in interaction keys
-  "name": "MDMA",
-  "category": "Entactogen / Stimulant", // free text; mapped to one of the five
-                                        // filter groups by normalizeCategory()
-  "mechanism": "…",
-  "onset": "Oral: 30–60 min.",
-  "duration": "Total: 4–6 h.",
-  "dosage": { "threshold": "50 mg", "light": "60 mg", "common": "75–125 mg", "strong": "150+ mg" },
-  "effects": ["…"],
-  "acuteRisks": ["…"],
-  "harmReduction": ["…"],
-  "contraindications": ["…"]
-}
+- **TripSit API** (`getAllDrugs`) — effects, onset, duration, dosage ranges,
+  aliases, drug class, and interactions.
+- **`data/curated.json`** — the hand-maintained substance set with the fields
+  TripSit doesn't provide (mechanism, acute risks, harm reduction,
+  contraindications) plus the curated pairwise interaction summaries.
+
+Rebuild it with:
+
+```sh
+npm run build:data   # fetch-tripsit.js (network) + build-data.js (merge)
 ```
 
-## Adding an interaction
+`build-data.js` is **fill-only**: curated text is authoritative and is never
+overwritten — TripSit only fills fields a curated entry leaves blank. UK legal
+status is authored in `build-data.js` from Talk to Frank's class/penalty
+summaries (not scraped). To add a substance, add it to `data/curated.json`
+(and, if it has a TripSit equivalent, map its id in the `TRIPSIT_KEY` table in
+`scripts/build-data.js`), then run `npm run build:data`.
 
-Interactions live in `window.interactions` in the same file, keyed by the two
-substance ids **sorted alphabetically and joined with `|`**:
+The pairwise interaction map keys two substance ids **sorted alphabetically and
+joined with `|`** (e.g. `"alcohol|mdma"`); risk is one of `low | caution |
+dangerous | do not combine`. Unknown pairs default to **CAUTION** with a
+"limited data" message.
 
-```js
-"2cb|alcohol": {
-  risk: "caution", // one of: "low" | "caution" | "dangerous" | "do not combine"
-  summary: "Increased nausea and impaired judgment.",
-},
-```
-
-Unknown pairs default to **CAUTION** with a "limited data" message.
-
-Run `npm test` after editing — the data integrity tests catch duplicate ids,
-malformed interaction keys, and invalid risk levels.
+Run `npm test` after rebuilding — the data integrity tests catch duplicate ids,
+malformed interaction keys, missing fields, and invalid risk levels.
 
 ## Development
 
@@ -87,18 +83,17 @@ CI runs all three on every push and blocks deployment if they fail.
 ### Releasing changes
 
 Deployment to GitHub Pages is automatic on push to `master`/`main`
-(`.github/workflows/deploy.yml`). **If you change any site asset
-(`app.js`, `data.js`, `styles.css`, `logic.js`, `index.html`), bump the
-`CACHE` version string at the top of [`sw.js`](sw.js)** — otherwise returning
-visitors keep the old cached assets.
+(`.github/workflows/deploy.yml`). **If you change any deployed asset
+(`app.js`, `styles.css`, `logic.js`, `index.html`, `data/drugs.json`), bump
+the `CACHE` version string at the top of [`sw.js`](sw.js)** — otherwise
+returning visitors keep the old cached assets.
 
 ## Repository notes
 
-- [`frank_drugs.json`](frank_drugs.json) is structured source data scraped
-  from Talk to Frank's embedded page JSON. It is kept for provenance but is
-  **not** deployed or loaded by the site. Refresh it with
-  `node scripts/fetch-frank.js`, then merge new data into `data.js` with
-  `node scripts/enrich-data.js` (fill-only: it never overwrites curated
-  fields, only fills missing ones).
+- [`data/tripsit-raw.json`](data/tripsit-raw.json) is the committed TripSit
+  snapshot used by the build; refresh it with `node scripts/fetch-tripsit.js`.
+- [`frank_drugs.json`](frank_drugs.json) is older structured source data
+  scraped from Talk to Frank. It is kept for provenance but is **not** deployed
+  or loaded by the site (`scripts/fetch-frank.js` / `scripts/enrich-data.js`).
 - [`logic.js`](logic.js) holds the pure, testable logic (filtering, category
   normalisation, interaction lookup); [`app.js`](app.js) holds DOM wiring.

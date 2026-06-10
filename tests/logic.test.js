@@ -44,6 +44,17 @@ test("normalizeCategory: entactogen wins over stimulant in combined labels", () 
   );
 });
 
+test("normalizeCategory reads the drug_class field", () => {
+  assert.equal(
+    normalizeCategory({ drug_class: "Stimulant, Psychedelic, Empathogen" }),
+    "empathogens",
+  );
+  assert.equal(
+    normalizeCategory({ drug_class: "Dissociative" }),
+    "dissociatives",
+  );
+});
+
 test("normalizeCategory falls back to other for unknown or missing", () => {
   assert.equal(
     normalizeCategory({ category: "Image/performance enhancing" }),
@@ -196,26 +207,35 @@ test("extractCommonRange pulls the range out of prose", () => {
 });
 
 test("normalizeDosage passes object dosages through with defaults", () => {
-  assert.deepEqual(normalizeDosage({ threshold: "5 mg", common: "10 mg" }), {
-    threshold: "5 mg",
-    light: "-",
-    common: "10 mg",
-    strong: "-",
-  });
+  assert.deepEqual(
+    normalizeDosage({ route: "Oral", threshold: "5 mg", common: "10 mg" }),
+    {
+      route: "Oral",
+      threshold: "5 mg",
+      light: "-",
+      common: "10 mg",
+      strong: "-",
+      heavy: "-",
+    },
+  );
 });
 
 test("normalizeDosage handles string and missing dosages", () => {
   assert.deepEqual(normalizeDosage("Common range: 1-2 g."), {
+    route: null,
     threshold: "-",
     light: "-",
     common: "1-2 g",
     strong: "-",
+    heavy: "-",
   });
   assert.deepEqual(normalizeDosage(null), {
+    route: null,
     threshold: "-",
     light: "-",
     common: "-",
     strong: "-",
+    heavy: "-",
   });
 });
 

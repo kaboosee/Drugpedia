@@ -3,6 +3,7 @@
   "private": true,
   "description": "Harm reduction reference site - dev tooling only, the site itself is buildless",
   "scripts": {
+    "build:data": "node scripts/fetch-tripsit.js && node scripts/build-data.js",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

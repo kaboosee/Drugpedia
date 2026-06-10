@@ -1,4 +1,4 @@
 node_modules/
 frank_drugs.json
 package-lock.json
-data.js
+data/tripsit-raw.json

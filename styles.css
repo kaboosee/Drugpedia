@@ -355,6 +355,13 @@ option {
   gap: 12px 18px;
 }
 
+/* Keep both halves of the pair identical — the first-child reset would
+   otherwise strip the grey top rule and padding from "Also known as". */
+.detail-pair .detail-section {
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+}
+
 .detail-section h3 {
   margin: 0 0 8px;
   font-size: 0.82rem;
@@ -857,7 +864,14 @@ option {
   /* Reserve space on the right so the header text never runs under the
      absolutely-positioned theme toggle. */
   header {
-    padding: 10px 60px 8px 12px;
+    padding: 10px 78px 8px 12px;
+  }
+
+  .theme-toggle {
+    top: 10px;
+    right: 12px;
+    padding: 5px 8px;
+    font-size: 0.62rem;
   }
 
   header h1 {
